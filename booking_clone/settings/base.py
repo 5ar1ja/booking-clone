@@ -28,7 +28,8 @@ DJANGO_AND_THIRD_PARTY_APPS = [
 ]
 
 PROJECT_APPS = [
-    "apps.users"
+    "apps.users",
+    "apps.properties"
 ]
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
