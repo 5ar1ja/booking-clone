@@ -78,6 +78,7 @@ class CustomUserViewSet(ViewSet):
                 "email": user.email,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
+                "avatar": user.avatar,
                 "is_landlord": user.is_landlord,
                 "is_renter": user.is_renter,
             },

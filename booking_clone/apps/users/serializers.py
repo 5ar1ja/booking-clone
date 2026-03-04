@@ -23,6 +23,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             "password",
             "first_name",
             "last_name",
+            "avatar",
             "is_landlord",
             "is_renter",
         ]
@@ -43,12 +44,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = (
-            "email", 
-            "password", 
-            "first_name", 
-            "last_name", 
-            "is_landlord", 
-            "is_renter"
+            "email",
+            "password",
+            "first_name",
+            "last_name",
+            "avatar",
+            "is_landlord",
+            "is_renter",
         )
 
     def validate(self, data):
@@ -66,6 +68,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # This calls the CustomUserManager method you wrote earlier
         return CustomUser.objects.create_user(**validated_data)
+
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -85,13 +88,13 @@ class UserLoginSerializer(serializers.Serializer):
 
             if not user:
                 raise ValidationError("Invalid email or password.")
-            
+
             if not user.is_active:
                 raise ValidationError("User account is disabled.")
         else:
             raise ValidationError("Must include 'email' and 'password'.")
 
-        # Мы добавляем найденного юзера в проверенные данные, 
+        # Мы добавляем найденного юзера в проверенные данные,
         # чтобы View мог его легко достать и выдать ему токен
         data["user"] = user
         return data
