@@ -1,10 +1,7 @@
 from django.contrib.admin import register
 from django.contrib.auth.admin import UserAdmin
-
 from apps.users.models import CustomUser
 
-
-# Register your models here.
 @register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     """Admin panel for User"""
@@ -13,6 +10,7 @@ class CustomUserAdmin(UserAdmin):
         "email",
         "first_name",
         "last_name",
+        "avatar",
         "is_landlord",
         "is_renter",
         "is_active",
@@ -20,21 +18,21 @@ class CustomUserAdmin(UserAdmin):
         "is_superuser"
     )
 
-    #searching
-    search_fields = (
-        "email",
-        "first_name",
-        "last_name",
-    )
-    #filters in right side
+    search_fields = ("email", "first_name", "last_name")
     list_filter = ("is_landlord", "is_renter", "is_active", "is_staff")
-    #sorting by email
     ordering = ("email",)
 
-    fieldsets = UserAdmin.fieldsets + (
-        (None, {"fields": ("is_landlord", "is_renter")}),
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        ("Personal info", {"fields": ("first_name", "last_name", "avatar")}),
+        ("Roles", {"fields": ("is_landlord", "is_renter")}),
+        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
 
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {"fields": ("is_landlord", "is_renter")}),
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("email", "password", "first_name", "last_name", "is_landlord", "is_renter"),
+        }),
     )

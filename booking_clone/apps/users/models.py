@@ -37,6 +37,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
+    avatar = models.ImageField(upload_to="avatar/", null=True, blank=True)
 
     # -- Role Flags --
     is_landlord = models.BooleanField(default=False)

@@ -1,10 +1,15 @@
 from django.urls import path, include
+from django.conf.urls.static import static
+
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenRefreshView
 from apps.users.views import CustomUserViewSet
+from settings.base import MEDIA_ROOT, MEDIA_URL
 
 router = DefaultRouter()
-router.register(r'', CustomUserViewSet, basename='users')
+router.register(r"", CustomUserViewSet, basename="users")
 
 urlpatterns = [
-    path('', include(router.urls)),
-]
+    path("", include(router.urls)),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+] + static(MEDIA_URL, document_root=MEDIA_ROOT)

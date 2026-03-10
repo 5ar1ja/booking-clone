@@ -9,11 +9,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
 
 from apps.users.serializers import UserLoginSerializer, UserRegistrationSerializer, CustomUserSerializer
-# CustomUser импортируем только если используем его для типизации
 
 
 class CustomUserViewSet(ViewSet):
-    # По умолчанию — только для залогиненных
     permission_classes = (IsAuthenticated,)
 
     @action(
@@ -26,11 +24,8 @@ class CustomUserViewSet(ViewSet):
             serializer = UserRegistrationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             
-            # 1. Сохраняем юзера (вызывает метод create в сериализаторе)
             user = serializer.save() 
             
-            # 2. Вместо ручного перечисления полей, берем данные из CustomUserSerializer
-            # Это делает код вьюхи коротким, сколько бы полей ни было в модели.
             response_data = CustomUserSerializer(user).data
             
             return DRFResponse(data=response_data, status=201)
@@ -39,7 +34,7 @@ class CustomUserViewSet(ViewSet):
         methods=("post",),
         detail=False,
         url_path="login",
-        permission_classes=(AllowAny,),  # Разрешаем всем
+        permission_classes=(AllowAny,),
     )
     def login(self, request: DRFRequest, *args: Any, **kwargs: Any) -> DRFResponse:
         serializer = UserLoginSerializer(data=request.data)
@@ -65,9 +60,7 @@ class CustomUserViewSet(ViewSet):
     @action(
         methods=["get"],
         detail=False,
-        url_path="personal-info",  # В URL лучше использовать дефис
-        # Здесь мы просто проверяем, что юзер залогинен.
-        # Его роль проверится внутри данных.
+        url_path="personal-info",
         permission_classes=(IsAuthenticated,),
     )
     def fetch_personal_info(self, request: DRFRequest) -> DRFResponse:
@@ -83,3 +76,17 @@ class CustomUserViewSet(ViewSet):
             },
             status=HTTP_200_OK,
         )
+    
+    @action(
+        methods=["patch"],
+        detail=False,
+        url_path="update-profile",
+        permission_classes=(IsAuthenticated,),
+    )
+    def update_profile(self, request: DRFRequest) -> DRFResponse:
+        user = request.user
+
+        serializer = CustomUserSerializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return DRFResponse(serializer.data, status=HTTP_200_OK)
