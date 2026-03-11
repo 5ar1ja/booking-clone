@@ -5,12 +5,19 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Артефакты для ии, например, Claude или GPT
+artifacts/
+
 # Virtual environment
 venv/
 .env/
 .venv/
-env/
-ENV/
+
+# logs
+!logs/
+!logs/.gitkeep
+*.log
+
 
 # =========================
 # Environment variables
@@ -22,7 +29,6 @@ ENV/
 # =========================
 # Django
 # =========================
-*.log
 local_settings.py
 db.sqlite3
 media/

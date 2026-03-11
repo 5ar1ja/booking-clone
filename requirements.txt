@@ -1,7 +1,6 @@
 asgiref==3.11.1
 attrs==25.4.0
 Django==6.0.2
-django-debug-toolbar==6.2.0
 django-filter==25.2
 django-redis==6.0.0
 djangorestframework==3.16.1
