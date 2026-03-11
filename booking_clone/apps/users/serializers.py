@@ -9,13 +9,18 @@ from apps.users.models import CustomUser
 class CustomUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, style={"input_type": "password"})
-    avatar = serializers.SerializerMethodField()
+    # avatar = serializers.SerializerMethodField()
 
     first_name = serializers.CharField()
     last_name = serializers.CharField()
 
     is_landlord = serializers.BooleanField()
     is_renter = serializers.BooleanField()
+
+    def get_avatar(self, obj):
+        if obj.avatar:
+            return obj.avatar.url
+        return None
 
     class Meta:
         model = CustomUser

@@ -1,3 +1,4 @@
+import logging
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -8,6 +9,7 @@ from .models import Booking
 from .serializers import BookingSerializer, BookingStatusSerializer
 from .permissions import IsRenterOrReadOnly, IsApartmentOwnerForBooking, IsBookingTenant
 
+logger = logging.getLogger("apps.bookings")
 
 class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
@@ -34,6 +36,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(tenant=self.request.user)
+        logger.info("Booking created: tenant=%s, apartment_id=%s", self.request.user.email, serializer.instance.apartment_id)
 
     # ───── Block unsafe default actions ─────
     def update(self, request, *args, **kwargs):
@@ -66,6 +69,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             )
         booking.status = Booking.Status.CANCELLED
         booking.save(update_fields=["status"])
+        logger.info("Booking %s cancelled by %s", booking.id, request.user.email)
         return Response(BookingSerializer(booking).data)
 
     @action(methods=["patch"], detail=True, url_path="update-status")
@@ -75,4 +79,5 @@ class BookingViewSet(viewsets.ModelViewSet):
         serializer = BookingStatusSerializer(booking, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        logger.info("Booking #%s status → %s by landlord=%s", booking.id, serializer.validated_data.get("status"), request.user.email)
         return Response(BookingSerializer(booking).data)

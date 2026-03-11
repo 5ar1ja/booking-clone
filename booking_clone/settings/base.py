@@ -96,6 +96,37 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+import os
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{levelname}] {asctime} | {name} | {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs", "app.log"),
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "apps.users":     {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+        "apps.bookings":  {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+        "apps.reviews":   {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+        "apps.properties":{"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+    },
+}
+
+
 # ----------------------------------------------
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

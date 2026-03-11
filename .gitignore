@@ -13,6 +13,12 @@ venv/
 .env/
 .venv/
 
+# logs
+!logs/
+!logs/.gitkeep
+*.log
+
+
 # =========================
 # Environment variables
 # =========================
@@ -23,7 +29,6 @@ venv/
 # =========================
 # Django
 # =========================
-*.log
 local_settings.py
 db.sqlite3
 media/

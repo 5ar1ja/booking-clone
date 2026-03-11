@@ -1,4 +1,5 @@
 from typing import Any
+import logging
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from rest_framework.viewsets import ViewSet
@@ -10,6 +11,7 @@ from rest_framework.decorators import action
 
 from apps.users.serializers import UserLoginSerializer, UserRegistrationSerializer, CustomUserSerializer
 
+logger = logging.getLogger("apps.users")
 
 class CustomUserViewSet(ViewSet):
     permission_classes = (IsAuthenticated,)
@@ -24,7 +26,9 @@ class CustomUserViewSet(ViewSet):
             serializer = UserRegistrationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             
-            user = serializer.save() 
+            user = serializer.save()
+
+            logger.info("New user registered: %s (landlord=%s, renter=%s)", user.email, user.is_landlord, user.is_renter)
             
             response_data = CustomUserSerializer(user).data
             
@@ -41,6 +45,7 @@ class CustomUserViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.validated_data["user"]
+        logger .info("User logged in: %s", user.email)
         refresh = RefreshToken.for_user(user)
 
         return DRFResponse(
@@ -89,4 +94,5 @@ class CustomUserViewSet(ViewSet):
         serializer = CustomUserSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        logger.info("Profile updated: %s", request.user.email)
         return DRFResponse(serializer.data, status=HTTP_200_OK)
