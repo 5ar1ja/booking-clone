@@ -6,6 +6,7 @@ from settings.conf import *  # noqa: F403
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DEBUG = True
 
 # ----------------------------------------------
 # Path
@@ -14,7 +15,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_URLCONF = "settings.urls"
 WSGI_APPLICATION = "settings.wsgi.application"
 ASGI_APPLICATION = "settings.asgi.application"
-AUTH_USER_MODEL = "auths.CustomUser"
+AUTH_USER_MODEL = "auth.User"
 
 # Application definition
 
@@ -27,7 +28,10 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     "django.contrib.staticfiles",
 ]
 
-PROJECT_APPS = []
+PROJECT_APPS = [
+    "rest_framework",
+    "apps.properties",
+]
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
 
@@ -59,6 +63,17 @@ TEMPLATES = [
         },
     },
 ]
+
+DATABASES = {
+    "default" : {
+        "ENGINE" : "django.db.backends.postgresql",
+        "NAME" : os.getenv("DB_NAME", ""),
+        "USER" : os.getenv("DB_USER", ""),
+        "PASSWORD" : os.getenv("DB_PASSWORD", ""),
+        "HOST" : os.getenv("DB_HOST", "localhost"),
+        "PORT" : os.getenv("DB_PORT", "5432"),
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {

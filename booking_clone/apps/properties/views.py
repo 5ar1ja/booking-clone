@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet
 
-# Create your views here.
+from apps.properties.models import City
+from apps.properties.serializers import CitySerializer
+
+
+class CityViewSet(ModelViewSet):
+    queryset = City.objects.all().order_by("-created_at")
+    serializer_class = CitySerializer
