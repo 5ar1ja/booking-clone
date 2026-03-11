@@ -342,7 +342,7 @@ not all modules are merged into `main` yet.
 
 - `GET /admin/` (Django admin)
 
-#### `feature/city-crud` and `feature/city-crud-z3sker`
+#### `feature/city-crud`
 
 - `GET /api/cities/`
 - `POST /api/cities/`
