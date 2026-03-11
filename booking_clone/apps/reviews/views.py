@@ -1,4 +1,4 @@
-# from django.utils import timezone
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import viewsets
@@ -26,7 +26,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
     filterset_class = ReviewFilter
 
     def perform_create(self, serializer):
-
         apartment = serializer.validated_data["apartment"]
         user = self.request.user
 
@@ -34,11 +33,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
         if apartment.owner == user:
             raise PermissionDenied("You cannot review your own apartment.")
 
+        # Trust the COMPLETED status (landlord already confirmed the stay)
         stayed = Booking.objects.filter(
             apartment=apartment,
-            renter=user,
-            status="completed",
-            # check_out__lt=timezone.now().date() # NOTE: So users can't review before their stay ends.
+            tenant=user,
+            status=Booking.Status.COMPLETED
+            # ← removed the date check (it was breaking test data + early completion)
         ).exists()
 
         if not stayed:

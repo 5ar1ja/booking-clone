@@ -36,7 +36,7 @@ class BookingSerializer(serializers.ModelSerializer):
         return data
     
 class BookingStatusSerializer(serializers.ModelSerializer):
-    # Нужен только для смены статуса - используется владельцем квартиры
+    # Needed only for changing status - used by apartment owner
 
     class Meta:
         model = Booking

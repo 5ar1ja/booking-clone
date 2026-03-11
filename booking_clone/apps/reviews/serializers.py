@@ -17,4 +17,4 @@ class ReviewSerializer(serializers.ModelSerializer):
             "created_at",
         ]
 
-        read_only_fields = ["author", "created_at"]
+        read_only_fields = ["author", "created_at"] 

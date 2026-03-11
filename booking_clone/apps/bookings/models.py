@@ -9,17 +9,18 @@ class Booking(models.Model):
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
         CONFIRMED = "confirmed", "Confirmed"
+        COMPLETED = "completed", "Completed"
         CANCELLED = "cancelled", "Cancelled"
 
     tenant = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="booking"
+        related_name="bookings"
     )
     apartment = models.ForeignKey(
         Apartment,
         on_delete=models.CASCADE,
-        related_name="booking"
+        related_name="bookings"
     )
 
     check_in = models.DateField()
@@ -41,13 +42,13 @@ class Booking(models.Model):
         return f"Booking #{self.id} - {self.tenant.email} → {self.apartment.title}"
 
     def clean(self):
-        if self.check_in > self.check_out:
-            raise ValidationError("chack_out must be after check_in")
+        if self.check_in >= self.check_out:
+            raise ValidationError("check_out must be after check_in")
         
         overlapping = Booking.objects.filter(
             apartment=self.apartment,
-            status__id=[self.Status.PENDING, self.Status.CONFIRMED],
-            check_in__lf=self.check_out,
+            status__in=[self.Status.PENDING, self.Status.CONFIRMED],
+            check_in__lt=self.check_out,
             check_out__gt=self.check_in,
         ).exclude(pk=self.pk)
 
@@ -56,7 +57,7 @@ class Booking(models.Model):
         
     def save(self, *args, **kwargs):
         self.full_clean()
-        # Автоматически считает total_price
+        # Automatically calculates total_price
         nights = (self.check_out - self.check_in).days
         self.total_price = nights * self.apartment.price_per_night
         super().save(*args, **kwargs)
