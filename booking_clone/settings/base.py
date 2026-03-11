@@ -1,5 +1,4 @@
 from pathlib import Path
-import os
 
 from settings.conf import *  # noqa: F403
 
@@ -10,11 +9,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ----------------------------------------------
 # Path
 #
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_URLCONF = "settings.urls"
 WSGI_APPLICATION = "settings.wsgi.application"
 ASGI_APPLICATION = "settings.asgi.application"
-AUTH_USER_MODEL = "auths.CustomUser"
+DEBUG_VALUE = str(
+    config("DEBUG", default=("true" if ENV_ID == "local" else "false"))
+).strip().lower()
+DEBUG = DEBUG_VALUE in ("1", "true", "yes", "on", "local", "dev", "development")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")
+    if host.strip()
+]
 
 # Application definition
 
@@ -27,7 +33,10 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     "django.contrib.staticfiles",
 ]
 
-PROJECT_APPS = []
+PROJECT_APPS = [
+    "rest_framework",
+    "apps.properties",
+]
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
 
@@ -87,12 +96,34 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Database
+# Defaults to SQLite for local development; can be overridden via env vars.
+DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
+if DB_ENGINE == "django.db.backends.sqlite3":
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": str(BASE_DIR / "db.sqlite3"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": config("DB_NAME", default=""),
+            "USER": config("DB_USER", default=""),
+            "PASSWORD": config("DB_PASSWORD", default=""),
+            "HOST": config("DB_HOST", default=""),
+            "PORT": config("DB_PORT", default=""),
+        }
+    }
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = BASE_DIR / "static"
 MEDIA_URL = "media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
