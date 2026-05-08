@@ -2,7 +2,7 @@
 import os
 
 # Project modules
-from settings.conf import *  # noqa: F403
+from settings.conf import *  # noqa
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -49,15 +49,6 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -73,7 +64,6 @@ TEMPLATES = [
     },
 ]
 
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -88,47 +78,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '[{levelname}] {asctime} | {name} | {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'app.log'),
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'apps.users':      {'handlers': ['console', 'file'], 'level': 'INFO', 'propagate': False},
-        'apps.bookings':   {'handlers': ['console', 'file'], 'level': 'INFO', 'propagate': False},
-        'apps.reviews':    {'handlers': ['console', 'file'], 'level': 'INFO', 'propagate': False},
-        'apps.properties': {'handlers': ['console', 'file'], 'level': 'INFO', 'propagate': False},
-    },
-}
-
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
-    }
-}
-
 
 
 LANGUAGE_CODE = 'en-us'
