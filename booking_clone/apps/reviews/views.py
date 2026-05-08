@@ -13,8 +13,8 @@ from .filters import ReviewFilter
 class ReviewViewSet(viewsets.ModelViewSet):
 
     queryset = Review.objects.select_related(
-        "author",
-        "apartment"
+        'author',
+        'apartment'
     )
 
     serializer_class = ReviewSerializer
@@ -25,12 +25,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
     filterset_class = ReviewFilter
 
     def perform_create(self, serializer):
-        apartment = serializer.validated_data["apartment"]
+        apartment = serializer.validated_data['apartment']
         user = self.request.user
 
         # Prevent reviewing own apartment
         if apartment.owner == user:
-            raise PermissionDenied("You cannot review your own apartment.")
+            raise PermissionDenied('You cannot review your own apartment.')
 
         # Trust the COMPLETED status (landlord already confirmed the stay)
         stayed = Booking.objects.filter(
@@ -42,7 +42,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
         if not stayed:
             raise PermissionDenied(
-                "You can only review apartments you have stayed in."
+                'You can only review apartments you have stayed in.'
             )
 
         serializer.save(author=user)

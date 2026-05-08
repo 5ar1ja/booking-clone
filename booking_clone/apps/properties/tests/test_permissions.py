@@ -9,8 +9,8 @@ class ApartmentPermissionTests(BaseApartmentTest):
         self.client.force_authenticate(user=self.landlord)
 
         response = self.client.patch(
-            f"/properties/apartments/{self.apt1.id}/",
-            {"title": "Updated Title"}
+            f'/properties/apartments/{self.apt1.id}/',
+            {'title': 'Updated Title'}
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -20,8 +20,8 @@ class ApartmentPermissionTests(BaseApartmentTest):
         self.client.force_authenticate(user=self.renter)
 
         response = self.client.patch(
-            f"/properties/apartments/{self.apt1.id}/",
-            {"title": "Hack"}
+            f'/properties/apartments/{self.apt1.id}/',
+            {'title': 'Hack'}
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

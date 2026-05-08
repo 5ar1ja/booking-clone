@@ -9,17 +9,17 @@ from .models import Booking
 from .serializers import BookingSerializer, BookingStatusSerializer
 from .permissions import IsRenterOrReadOnly, IsApartmentOwnerForBooking, IsBookingTenant
 
-logger = logging.getLogger("apps.bookings")
+logger = logging.getLogger('apps.bookings')
 
 class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
     permission_classes = [IsRenterOrReadOnly]          # ← now the default (cleaner)
-    http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 
     def get_permissions(self):
-        if self.action == "cancel":
+        if self.action == 'cancel':
             return [IsAuthenticated(), IsBookingTenant()]
-        if self.action == "update_status":
+        if self.action == 'update_status':
             return [IsAuthenticated(), IsApartmentOwnerForBooking()]
         # list, create, retrieve → handled by IsRenterOrReadOnly
         return super().get_permissions()
@@ -29,55 +29,55 @@ class BookingViewSet(viewsets.ModelViewSet):
         if user.is_landlord:
             return Booking.objects.filter(
                 apartment__owner=user
-            ).select_related("tenant", "apartment")
+            ).select_related('tenant', 'apartment')
         return Booking.objects.filter(
             tenant=user
-        ).select_related("tenant", "apartment")
+        ).select_related('tenant', 'apartment')
 
     def perform_create(self, serializer):
         serializer.save(tenant=self.request.user)
-        logger.info("Booking created: tenant=%s, apartment_id=%s", self.request.user.email, serializer.instance.apartment_id)
+        logger.info('Booking created: tenant=%s, apartment_id=%s', self.request.user.email, serializer.instance.apartment_id)
 
     # ───── Block unsafe default actions ─────
     def update(self, request, *args, **kwargs):
         return Response(
-            {"detail": "Full update not allowed. Use /cancel/ or /update-status/."},
+            {'detail': 'Full update not allowed. Use /cancel/ or /update-status/.'},
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
     def partial_update(self, request, *args, **kwargs):
         return Response(
-            {"detail": "Partial update not allowed. Use /cancel/ or /update-status/ instead."},
+            {'detail': 'Partial update not allowed. Use /cancel/ or /update-status/ instead.'},
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
     def destroy(self, request, *args, **kwargs):
         return Response(
-            {"detail": "Deletion not allowed. Use the /cancel/ action instead."},
+            {'detail': 'Deletion not allowed. Use the /cancel/ action instead.'},
             status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
     # ───── Custom actions ─────
-    @action(methods=["patch"], detail=True, url_path="cancel")
+    @action(methods=['patch'], detail=True, url_path='cancel')
     def cancel(self, request: DRFRequest, pk=None) -> Response:
-        """Renter cancels their own booking."""
+        '''Renter cancels their own booking.'''
         booking = self.get_object()
         if booking.status == Booking.Status.CANCELLED:
             return Response(
-                {"detail": "Booking is already cancelled."},
+                {'detail': 'Booking is already cancelled.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         booking.status = Booking.Status.CANCELLED
-        booking.save(update_fields=["status"])
-        logger.info("Booking %s cancelled by %s", booking.id, request.user.email)
+        booking.save(update_fields=['status'])
+        logger.info('Booking %s cancelled by %s', booking.id, request.user.email)
         return Response(BookingSerializer(booking).data)
 
-    @action(methods=["patch"], detail=True, url_path="update-status")
+    @action(methods=['patch'], detail=True, url_path='update-status')
     def update_status(self, request: DRFRequest, pk=None) -> Response:
-        """Landlord accepts or rejects the booking."""
+        '''Landlord accepts or rejects the booking.'''
         booking = self.get_object()
         serializer = BookingStatusSerializer(booking, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        logger.info("Booking #%s status → %s by landlord=%s", booking.id, serializer.validated_data.get("status"), request.user.email)
+        logger.info('Booking #%s status → %s by landlord=%s', booking.id, serializer.validated_data.get('status'), request.user.email)
         return Response(BookingSerializer(booking).data)

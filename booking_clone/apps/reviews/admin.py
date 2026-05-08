@@ -6,12 +6,12 @@ from .models import Review
 class ReviewAdmin(admin.ModelAdmin):
 
     list_display = (
-        "id",
-        "apartment",
-        "author",
-        "rating",
-        "created_at",
+        'id',
+        'apartment',
+        'author',
+        'rating',
+        'created_at',
     )
 
-    list_filter = ("rating", "created_at")
-    search_fields = ("comment",)
+    list_filter = ('rating', 'created_at')
+    search_fields = ('comment',)

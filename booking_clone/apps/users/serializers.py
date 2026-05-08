@@ -8,7 +8,7 @@ from apps.users.models import CustomUser
 
 class CustomUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
-    password = serializers.CharField(write_only=True, style={"input_type": "password"}, required=False)
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'}, required=False)
 
     first_name = serializers.CharField()
     last_name = serializers.CharField()
@@ -19,28 +19,28 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            "email",
-            "password",
-            "first_name",
-            "last_name",
-            "is_landlord",
-            "is_renter",
+            'email',
+            'password',
+            'first_name',
+            'last_name',
+            'is_landlord',
+            'is_renter',
         ]
 
-        read_only_fields = ["is_staff", "is_superuser"]
+        read_only_fields = ['is_staff', 'is_superuser']
 
     def update(self, instance, validated_data):
-        password = validated_data.pop("password", None)
+        password = validated_data.pop('password', None)
         instance = super().update(instance, validated_data)
         if password:
             instance.set_password(password)
-            instance.save(update_fields=["password"])
+            instance.save(update_fields=['password'])
         return instance
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
-    password = serializers.CharField(write_only=True, style={"input_type": "password"})
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
 
     first_name = serializers.CharField()
     last_name = serializers.CharField()
@@ -51,27 +51,27 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = (
-            "email",
-            "password",
-            "first_name",
-            "last_name",
-            "is_landlord",
-            "is_renter",
+            'email',
+            'password',
+            'first_name',
+            'last_name',
+            'is_landlord',
+            'is_renter',
         )
 
     def validate(self, data):
-        landlord = data.get("is_landlord")
-        renter = data.get("is_renter")
+        landlord = data.get('is_landlord')
+        renter = data.get('is_renter')
 
         if landlord == renter:
             raise ValidationError(
-                "You must choose exactly one role: Landlord or Renter."
+                'You must choose exactly one role: Landlord or Renter.'
             )
 
         return data
 
     def create(self, validated_data):
-        password = validated_data.pop("password")
+        password = validated_data.pop('password')
         user = CustomUser.objects.create_user(password=password, **validated_data)
         return user
 
@@ -81,19 +81,19 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        email = data.get("email")
-        password = data.get("password")
+        email = data.get('email')
+        password = data.get('password')
 
         if email and password:
             user = authenticate(email=email, password=password)
 
             if not user:
-                raise ValidationError("Invalid email or password.")
+                raise ValidationError('Invalid email or password.')
 
             if not user.is_active:
-                raise ValidationError("User account is disabled.")
+                raise ValidationError('User account is disabled.')
         else:
-            raise ValidationError("Must include 'email' and 'password'.")
+            raise ValidationError('Must include \'email\' and \'password\'.')
 
-        data["user"] = user
+        data['user'] = user
         return data
