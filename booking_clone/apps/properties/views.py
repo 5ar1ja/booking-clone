@@ -3,7 +3,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
-# from django.core.cache import cache 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 

@@ -36,6 +36,7 @@ def _read_debug() -> bool:
 
 BOOKING_CLONE_ENV_ID = _read_env_id()
 DEBUG = _read_debug()
+# In production, always set SECRET_KEY via environment variable — never rely on the default.
 SECRET_KEY = config("SECRET_KEY", default="dev-secret-key-change-me")
 
 if BOOKING_CLONE_ENV_ID == "local":
@@ -50,7 +51,7 @@ else:
 # Django REST Framework
 #
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
@@ -61,7 +62,7 @@ REST_FRAMEWORK = {
 # Simple JWT
 #
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60), # HACK: changed 15 -> 60 temporarily for convenience
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -79,8 +80,6 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-    "ON_LOGIN_SUCCESS": "rest_framework_simplejwt.serializers.default_on_login_success",
-    "ON_LOGIN_FAILED": "rest_framework_simplejwt.serializers.default_on_login_failed",
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
     "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
@@ -130,20 +129,3 @@ DEBUG_TOOLBAR_PANELS = [
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-
-# ----------------------------------------------
-# Shell plus configuration (Django extensions)
-#
-SHELL_PLUS_PRE_IMPORTS = [
-    ("django.db", ("connection", "reset_queries", "connections")),
-    ("datetime", ("datetime", "timedelta", "date")),
-    ("json", ("loads", "dumps")),
-]
-SHELL_PLUS_MODEL_ALIASES = {
-    "auths": {
-        "CustomUser": "U",
-    },
-}
-SHELL_PLUS = "ipython"
-SHELL_PLUS_PRINT_SQL = True
-SHELL_PLUS_PRINT_SQL_TRUNCATE = 1000

@@ -1,12 +1,6 @@
-from pathlib import Path
 import os
-from decouple import config 
 
 from settings.conf import *  # noqa: F403
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # ----------------------------------------------
 # Path
@@ -16,8 +10,6 @@ ROOT_URLCONF = "settings.urls"
 WSGI_APPLICATION = "settings.wsgi.application"
 ASGI_APPLICATION = "settings.asgi.application"
 AUTH_USER_MODEL = "users.CustomUser"
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Application definition
 
@@ -28,19 +20,19 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
+
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_spectacular",
     "django_filters",
-    "debug_toolbar"
+    "debug_toolbar",
 ]
 
 PROJECT_APPS = [
     "apps.users",
     "apps.properties",
     "apps.reviews",
-    "apps.bookings"
+    "apps.bookings",
 ]
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
@@ -120,10 +112,10 @@ LOGGING = {
         },
     },
     "loggers": {
-        "apps.users":     {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
-        "apps.bookings":  {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
-        "apps.reviews":   {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
-        "apps.properties":{"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+        "apps.users":      {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+        "apps.bookings":   {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+        "apps.reviews":    {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+        "apps.properties": {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
     },
 }
 
@@ -131,13 +123,12 @@ LOGGING = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": config("BLOG_REDIS_URL", default="redis://127.0.0.1:6379/1"),
+        "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
-
 
 # ----------------------------------------------
 # Internationalization
@@ -150,7 +141,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

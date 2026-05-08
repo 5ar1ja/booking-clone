@@ -8,19 +8,13 @@ from apps.users.models import CustomUser
 
 class CustomUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
-    password = serializers.CharField(write_only=True, style={"input_type": "password"})
-    # avatar = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True, style={"input_type": "password"}, required=False)
 
     first_name = serializers.CharField()
     last_name = serializers.CharField()
 
     is_landlord = serializers.BooleanField()
     is_renter = serializers.BooleanField()
-
-    def get_avatar(self, obj):
-        if obj.avatar:
-            return obj.avatar.url
-        return None
 
     class Meta:
         model = CustomUser
@@ -34,6 +28,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
         ]
 
         read_only_fields = ["is_staff", "is_superuser"]
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+        instance = super().update(instance, validated_data)
+        if password:
+            instance.set_password(password)
+            instance.save(update_fields=["password"])
+        return instance
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -58,7 +60,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
-        # We get the values out of the 'data' dictionary
         landlord = data.get("is_landlord")
         renter = data.get("is_renter")
 
@@ -79,16 +80,11 @@ class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
-    class Meta:
-        model = CustomUser
-        fields = ("email", "password")
-
     def validate(self, data):
         email = data.get("email")
         password = data.get("password")
 
         if email and password:
-            # Search the User email and check password
             user = authenticate(email=email, password=password)
 
             if not user:
@@ -99,6 +95,5 @@ class UserLoginSerializer(serializers.Serializer):
         else:
             raise ValidationError("Must include 'email' and 'password'.")
 
-        # We show user data if we found
         data["user"] = user
         return data

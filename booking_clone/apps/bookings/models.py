@@ -53,7 +53,7 @@ class Booking(models.Model):
         ).exclude(pk=self.pk)
 
         if overlapping.exists():
-            raise ValidationError("This apartment is alredy booked for the selected dates")
+            raise ValidationError("This apartment is already booked for the selected dates")
         
     def save(self, *args, **kwargs):
         self.full_clean()

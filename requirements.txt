@@ -1,4 +1,5 @@
 asgiref==3.11.1
+django-debug-toolbar
 attrs==25.4.0
 Django==6.0.2
 django-filter==25.2

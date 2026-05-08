@@ -45,7 +45,7 @@ class CustomUserViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.validated_data["user"]
-        logger .info("User logged in: %s", user.email)
+        logger.info("User logged in: %s", user.email)
         refresh = RefreshToken.for_user(user)
 
         return DRFResponse(

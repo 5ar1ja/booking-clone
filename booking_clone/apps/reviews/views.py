@@ -1,4 +1,3 @@
-from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import viewsets

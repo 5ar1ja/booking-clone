@@ -5,15 +5,18 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Артефакты для ии, например, Claude или GPT
-artifacts/
 
+# =========================
 # Virtual environment
+# =========================
 venv/
 .env/
 .venv/
 
+
+# =========================
 # logs
+# =========================
 !logs/
 !logs/.gitkeep
 *.log
@@ -34,9 +37,11 @@ db.sqlite3
 media/
 staticfiles/
 
+
 # Migrations (если хотите игнорировать auto, но обычно НЕ игнорируют)
 # */migrations/*
 # !*/migrations/__init__.py
+
 
 # =========================
 # IDE / Editor
@@ -46,11 +51,13 @@ staticfiles/
 *.swp
 *.swo
 
+
 # =========================
 # OS files
 # =========================
 .DS_Store
 Thumbs.db
+
 
 # =========================
 # Pytest / coverage
@@ -59,10 +66,12 @@ Thumbs.db
 htmlcov/
 .pytest_cache/
 
+
 # =========================
 # Redis dump (если локально)
 # =========================
 dump.rdb
+
 
 # =========================
 # Docker (если будете использовать)
@@ -70,6 +79,7 @@ dump.rdb
 *.pid
 *.seed
 *.pid.lock
+
 
 # =========================
 # Celery (если вдруг добавите)
