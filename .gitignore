@@ -1,55 +1,24 @@
-# =========================
 # Python
-# =========================
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
 
-
-# =========================
-# Virtual environment
-# =========================
-venv/
-.env/
-.venv/
-
-
-# =========================
-# logs
-# =========================
-!logs/
-!logs/.gitkeep
-*.log
-
-
-# =========================
-# Environment variables
-# =========================
-.env
-.env.*
-!.env.example
-
-# =========================
 # Django
-# =========================
-local_settings.py
 db.sqlite3
-media/
-staticfiles/
+*.log
+logs/
 
+# Virtual env
+.env
+env/
+venv/
+.venv
+*/venv
+*/.venv
 
-# =========================
-# IDE / Editor
-# =========================
+# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
 
-
-# =========================
-# OS files
-# =========================
-.DS_Store
-Thumbs.db
-
+# Ruff
+.ruff_cache

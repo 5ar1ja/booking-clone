@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Apartment, City, Country
 
 
@@ -13,7 +14,7 @@ class CitySerializer(serializers.ModelSerializer):
     country_id = serializers.PrimaryKeyRelatedField(
         queryset=Country.objects.all(),
         source='country',
-        write_only=True
+        write_only=True,
     )
 
     class Meta:
@@ -22,14 +23,12 @@ class CitySerializer(serializers.ModelSerializer):
 
 
 class ApartmentSerializer(serializers.ModelSerializer):
-
     owner = serializers.ReadOnlyField(source='owner.email')
-
     city = CitySerializer(read_only=True)
     city_id = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.all(),
         source='city',
-        write_only=True
+        write_only=True,
     )
 
     class Meta:

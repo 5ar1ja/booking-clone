@@ -1,15 +1,12 @@
+# Python modules
 from datetime import timedelta
-
 from decouple import config
 
-# ----------------------------------------------
-# Env id
-#
+
 ENV_POSSIBLE_OPTIONS = ('dev', 'prod')
 
 
 def _read_env_id() -> str:
-    # Backward compatibility: support both old and new env variable names.
     raw = (
         config('BOOKING_CLONE_ENV_ID', default='')
         or config('DJANGORLAR_ENV_ID', default='')
@@ -36,20 +33,17 @@ def _read_debug() -> bool:
 
 BOOKING_CLONE_ENV_ID = _read_env_id()
 DEBUG = _read_debug()
-# In production, always set SECRET_KEY via environment variable — never rely on the default.
 SECRET_KEY = config('SECRET_KEY', default='dev-secret-key-change-me')
+
 
 if BOOKING_CLONE_ENV_ID == 'dev':
     from .env.dev import *  # noqa: F403
 elif BOOKING_CLONE_ENV_ID == 'prod':
     from .env.prod import *  # noqa: F403
 else:
-    # Fallback or development default
     from .env.dev import *  # noqa: F403
 
-# ----------------------------------------------
-# Django REST Framework
-#
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -58,9 +52,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# ----------------------------------------------
-# Simple JWT
-#
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
@@ -95,9 +87,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer',
 }
 
-# ----------------------------------------------
-# DRF Spectacular
-#
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Djangorlar API',
     'DESCRIPTION': 'Your project description',
@@ -105,9 +95,7 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-# ----------------------------------------------
-# Debug Toolbar
-#
+
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.history.HistoryPanel',
     'debug_toolbar.panels.versions.VersionsPanel',

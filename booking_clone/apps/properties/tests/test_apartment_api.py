@@ -28,7 +28,7 @@ class ApartmentAPITests(BaseApartmentTest):
         response = self.client.post('/properties/apartments/', data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Apartment.objects.count(), 4) # 3 from base + 1 here
+        self.assertEqual(Apartment.objects.count(), 4)  # 3 from setUp + 1 here
 
     def test_renter_cannot_create_apartment(self):
 

@@ -1,38 +1,45 @@
-from typing import Any
 import logging
-from rest_framework_simplejwt.tokens import RefreshToken
+from typing import Any
 
-from rest_framework.viewsets import ViewSet
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response as DRFResponse
-from rest_framework.status import HTTP_200_OK
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import action
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
+from rest_framework.viewsets import ViewSet
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.users.serializers import UserLoginSerializer, UserRegistrationSerializer, CustomUserSerializer
+from apps.users.serializers import (
+    CustomUserSerializer,
+    UserLoginSerializer,
+    UserRegistrationSerializer,
+)
 
 logger = logging.getLogger('apps.users')
 
+
 class CustomUserViewSet(ViewSet):
+    '''Handles user registration, login, and profile management.'''
+
     permission_classes = (IsAuthenticated,)
 
     @action(
-            methods=['post'],
-            detail=False,
-            url_path='register',
-            permission_classes=(AllowAny,),
+        methods=['post'],
+        detail=False,
+        url_path='register',
+        permission_classes=(AllowAny,),
+    )
+    def register(self, request: DRFRequest) -> DRFResponse:
+        serializer = UserRegistrationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        logger.info(
+            'New user registered: %s (landlord=%s, renter=%s)',
+            user.email,
+            user.is_landlord,
+            user.is_renter,
         )
-    def register(self, request: DRFRequest):
-            serializer = UserRegistrationSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            
-            user = serializer.save()
-
-            logger.info('New user registered: %s (landlord=%s, renter=%s)', user.email, user.is_landlord, user.is_renter)
-            
-            response_data = CustomUserSerializer(user).data
-            
-            return DRFResponse(data=response_data, status=201)
+        return DRFResponse(data=CustomUserSerializer(user).data, status=HTTP_201_CREATED)
 
     @action(
         methods=('post',),
@@ -81,7 +88,7 @@ class CustomUserViewSet(ViewSet):
             },
             status=HTTP_200_OK,
         )
-    
+
     @action(
         methods=['patch'],
         detail=False,
@@ -90,7 +97,6 @@ class CustomUserViewSet(ViewSet):
     )
     def update_profile(self, request: DRFRequest) -> DRFResponse:
         user = request.user
-
         serializer = CustomUserSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
