@@ -1,0 +1,15 @@
+[tool.ruff.lint]
+select = [
+    "E", "F", "W", # Defaults
+    "I",           # Import sorting
+    "N",           # Naming conventions
+    "UP",          # Python upgrades
+    "B",           # Common bugs
+    "DJ",          # Django specific
+    "S",           # Security
+    "C4",          # Comprehension check
+    "ANN",         # flake8-annotations (type hints)
+]
+
+[tool.ruff.format]
+quote-style = "single"
