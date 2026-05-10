@@ -10,7 +10,7 @@ class IsLandlordOrReadOnly(BasePermission):
     def has_permission(self, request: Request, view: Any) -> bool:
         if request.method in SAFE_METHODS:
             return True
-        return request.user.is_authenticated and request.user.is_landlord
+        return bool(request.user and request.user.is_authenticated and request.user.is_landlord)
 
 
 class IsApartmentOwner(BasePermission):
@@ -19,4 +19,4 @@ class IsApartmentOwner(BasePermission):
     def has_object_permission(self, request: Request, view: Any, obj: Any) -> bool:
         if request.method in SAFE_METHODS:
             return True
-        return obj.owner == request.user
+        return bool(obj.owner == request.user)

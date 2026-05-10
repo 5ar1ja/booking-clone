@@ -11,26 +11,14 @@ class CountrySerializer(serializers.ModelSerializer):
 
 class CitySerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
-    country_id = serializers.PrimaryKeyRelatedField(
-        queryset=Country.objects.all(),
-        source='country',
-        write_only=True,
-    )
-
     class Meta:
         model = City
-        fields = ['id', 'name', 'country', 'country_id']
+        fields = ['id', 'name', 'country']
 
 
-class ApartmentSerializer(serializers.ModelSerializer):
+class ApartmentReadSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     city = CitySerializer(read_only=True)
-    city_id = serializers.PrimaryKeyRelatedField(
-        queryset=City.objects.all(),
-        source='city',
-        write_only=True,
-    )
-
     class Meta:
         model = Apartment
         fields = [
@@ -39,10 +27,30 @@ class ApartmentSerializer(serializers.ModelSerializer):
             'description',
             'address',
             'city',
-            'city_id',
             'price_per_night',
             'rooms',
             'owner',
             'created_at',
         ]
         read_only_fields = ['owner', 'created_at']
+
+
+class ApartmentWriteSerializer(serializers.ModelSerializer):
+    city_id = serializers.PrimaryKeyRelatedField(
+        queryset=City.objects.all(),
+        source='city',
+    )
+
+    class Meta:
+        model = Apartment
+        fields = [
+            'title',
+            'description',
+            'address',
+            'city_id',
+            'price_per_night',
+            'rooms',
+        ]
+        
+    def create(self, validated_data):
+        return super().create(validated_data)
