@@ -12,6 +12,9 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404
 
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+
 from apps.reviews.models import Review
 from apps.reviews.serializers import ReviewSerializer
 from .filters import ApartmentFilter
@@ -22,6 +25,59 @@ from .serializers import ApartmentReadSerializer, ApartmentWriteSerializer
 logger = logging.getLogger('apps.properties')
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="List all apartments",
+        description="Retrieve a list of all apartments with optional filtering by city, rooms, and price. Permissions: AllowAny (Read-only).",
+        responses={200: ApartmentReadSerializer(many=True)},
+    ),
+    create=extend_schema(
+        summary="Create a new apartment",
+        description="Add a new apartment listing to the platform. Permissions: Authenticated Landlords only.",
+        request=ApartmentWriteSerializer,
+        responses={201: ApartmentWriteSerializer, 400: OpenApiTypes.OBJECT},
+        examples=[
+            OpenApiExample(
+                'Apartment Creation Example',
+                value={
+                    'title': 'Luxury Penthouse',
+                    'description': 'A beautiful penthouse in the city center.',
+                    'address': '123 Main St',
+                    'city_id': 1,
+                    'price_per_night': '250.00',
+                    'rooms': 3
+                }
+            )
+        ]
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve apartment details",
+        description="Get detailed information about a specific apartment by its ID. Permissions: AllowAny (Read-only).",
+        responses={200: ApartmentReadSerializer, 404: OpenApiTypes.OBJECT},
+    ),
+    update=extend_schema(
+        summary="Update an apartment",
+        description="Update all fields of an existing apartment. Permissions: Authenticated Landlord who owns the apartment.",
+        request=ApartmentWriteSerializer,
+        responses={200: ApartmentWriteSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
+    ),
+    partial_update=extend_schema(
+        summary="Partially update an apartment",
+        description="Update specific fields of an existing apartment. Permissions: Authenticated Landlord who owns the apartment.",
+        request=ApartmentWriteSerializer,
+        responses={200: ApartmentWriteSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
+    ),
+    destroy=extend_schema(
+        summary="Delete an apartment",
+        description="Remove an apartment listing from the platform. Permissions: Authenticated Landlord who owns the apartment.",
+        responses={204: None, 403: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
+    ),
+    reviews=extend_schema(
+        summary="List reviews for an apartment",
+        description="Retrieve all reviews associated with a specific apartment. This endpoint is cached for 60 seconds. Permissions: AllowAny (Read-only).",
+        responses={200: ReviewSerializer(many=True), 404: OpenApiTypes.OBJECT},
+    ),
+)
 class ApartmentViewSet(viewsets.ViewSet):
     '''
     ViewSet for apartments.
