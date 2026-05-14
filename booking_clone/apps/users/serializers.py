@@ -69,6 +69,23 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user = CustomUser.objects.create_user(password=password, **validated_data)
         return user
 
+class PersonalInfoSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(read_only=True)
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
+    is_landlord = serializers.BooleanField(read_only=True)
+    is_renter = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = (
+            "email",
+            "first_name",
+            "last_name",
+            "is_landlord",
+            "is_renter",
+        )
+
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -97,3 +114,38 @@ class UserLoginSerializer(serializers.Serializer):
         # We show user data if we found
         data["user"] = user
         return data
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = (
+            "email",
+            "first_name",
+            "last_name",
+            "is_landlord",
+            "is_renter",
+        )
+
+    def validate(self, data):
+        # We get the values out of the 'data' dictionary
+        landlord = data.get("is_landlord")
+        renter = data.get("is_renter")
+
+        if landlord == renter:
+            raise ValidationError(
+                "You must choose exactly one role: Landlord or Renter."
+            )
+
+        return data
+
+    def update(self, instance, validated_data):
+        user = instance
+
+        user.email = validated_data.get("email", user.email)
+        user.first_name = validated_data.get("first_name", user.first_name)
+        user.last_name = validated_data.get("last_name", user.last_name)
+        user.is_landlord = validated_data.get("is_landlord", user.is_landlord)
+        user.is_renter = validated_data.get("is_renter", user.is_renter)
+
+        user.save()
+        return user

@@ -12,6 +12,8 @@ from apps.users.serializers import (
     UserLoginSerializer,
     UserRegistrationSerializer,
     CustomUserSerializer,
+    PersonalInfoSerializer,
+    UpdateProfileSerializer,
 )
 
 
@@ -66,17 +68,9 @@ class CustomUserViewSet(ViewSet):
     )
     def fetch_personal_info(self, request: DRFRequest) -> DRFResponse:
         user = request.user
-        return DRFResponse(
-            data={
-                "id": user.id,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "is_landlord": user.is_landlord,
-                "is_renter": user.is_renter,
-            },
-            status=HTTP_200_OK,
-        )
+
+        response_data = PersonalInfoSerializer(user).data
+        return DRFResponse(data=response_data, status=HTTP_200_OK)
 
     @action(
         methods=["patch"],
@@ -87,7 +81,9 @@ class CustomUserViewSet(ViewSet):
     def update_profile(self, request: DRFRequest) -> DRFResponse:
         user = request.user
 
-        serializer = CustomUserSerializer(user, data=request.data, partial=True)
+        serializer = UpdateProfileSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return DRFResponse(serializer.data, status=HTTP_200_OK)
+
+        updated_user = serializer.save()
+
+        return DRFResponse(data=serializer.data, status=HTTP_200_OK)
