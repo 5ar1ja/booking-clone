@@ -15,8 +15,9 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 
+from apps.core.pagination import StandardResultsSetPagination
 from apps.reviews.models import Review
-from apps.reviews.serializers import ReviewReadSerializer, ReviewWriteSerializer
+from apps.reviews.serializers import ReviewReadSerializer
 from .filters import ApartmentFilter
 from .models import Apartment
 from .permissions import IsApartmentOwner, IsLandlordOrReadOnly
@@ -88,6 +89,7 @@ class ApartmentViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, IsLandlordOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = ApartmentFilter
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         return Apartment.objects.select_related('city', 'city__country', 'owner').all()
@@ -108,6 +110,12 @@ class ApartmentViewSet(viewsets.ViewSet):
         backend = DjangoFilterBackend()
         queryset = backend.filter_queryset(request, queryset, self)
         
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        if page is not None:
+            serializer = ApartmentReadSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
         serializer = ApartmentReadSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -151,5 +159,12 @@ class ApartmentViewSet(viewsets.ViewSet):
         '''Returns all reviews for the given apartment (cached 60 s).'''
         apartment = self.get_object(pk)
         reviews = Review.objects.filter(apartment=apartment).select_related('author')
+        
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(reviews, request, view=self)
+        if page is not None:
+            serializer = ReviewReadSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
         serializer = ReviewReadSerializer(reviews, many=True)
         return Response(serializer.data)

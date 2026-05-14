@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 
+from apps.core.pagination import StandardResultsSetPagination
 from apps.bookings.models import Booking
 from .filters import ReviewFilter
 from .models import Review
@@ -70,6 +71,7 @@ class ReviewViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, IsReviewAuthorOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = ReviewFilter
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         return Review.objects.select_related('author', 'apartment').all()
@@ -85,6 +87,12 @@ class ReviewViewSet(viewsets.ViewSet):
         backend = DjangoFilterBackend()
         queryset = backend.filter_queryset(request, queryset, self)
         
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(queryset, request, view=self)
+        if page is not None:
+            serializer = ReviewReadSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
         serializer = ReviewReadSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -142,4 +150,3 @@ class ReviewViewSet(viewsets.ViewSet):
         review = self.get_object(pk)
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
