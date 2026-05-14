@@ -12,11 +12,7 @@ from .filters import ReviewFilter
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-
-    queryset = Review.objects.select_related(
-        "author",
-        "apartment"
-    )
+    queryset = Review.objects.select_related("author", "apartment")
 
     serializer_class = ReviewSerializer
 
@@ -37,13 +33,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
         stayed = Booking.objects.filter(
             apartment=apartment,
             tenant=user,
-            status=Booking.Status.COMPLETED
+            status=Booking.Status.COMPLETED,
             # ← removed the date check (it was breaking test data + early completion)
         ).exists()
 
         if not stayed:
-            raise PermissionDenied(
-                "You can only review apartments you have stayed in."
-            )
+            raise PermissionDenied("You can only review apartments you have stayed in.")
 
         serializer.save(author=user)

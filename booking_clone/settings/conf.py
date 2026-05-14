@@ -11,7 +11,7 @@ ENV_POSSIBLE_OPTIONS = (
 )
 BOOKING_CLONE_ENV_ID = config("BOOKING_CLONE_ENV_ID", cast=str, default="development")
 DEBUG = config("DEBUG", cast=bool, default=True)
-SECRET_KEY = config("SECRET_KEY", default="твой-запасной-ключ")
+SECRET_KEY = config("SECRET_KEY")
 
 if BOOKING_CLONE_ENV_ID == "local":
     from .env.local import *  # noqa: F403
@@ -32,12 +32,17 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+ACCESS_LIFETIME=60
+REFRESH_LIFETIME=7
+SLIDING_LIFETIME=5
+SLIDING_REFRESH_LIFETIME=1
+
 # ----------------------------------------------
 # Simple JWT
 #
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60), # HACK: changed 15 -> 60 temporarily for convenience
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=ACCESS_LIFETIME), # HACK: changed 15 -> 60 temporarily for convenience
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=REFRESH_LIFETIME),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
@@ -61,8 +66,8 @@ SIMPLE_JWT = {
     "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
     "JTI_CLAIM": "jti",
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
-    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=SLIDING_LIFETIME),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=SLIDING_REFRESH_LIFETIME),
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
     "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
@@ -100,10 +105,6 @@ DEBUG_TOOLBAR_PANELS = [
     "debug_toolbar.panels.community.CommunityPanel",
     "debug_toolbar.panels.redirects.RedirectsPanel",
     "debug_toolbar.panels.profiling.ProfilingPanel",
-]
-
-INTERNAL_IPS = [
-    "127.0.0.1",
 ]
 
 # ----------------------------------------------

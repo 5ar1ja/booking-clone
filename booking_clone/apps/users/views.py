@@ -4,31 +4,35 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.viewsets import ViewSet
 from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response as DRFResponse
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
 
-from apps.users.serializers import UserLoginSerializer, UserRegistrationSerializer, CustomUserSerializer
+from apps.users.serializers import (
+    UserLoginSerializer,
+    UserRegistrationSerializer,
+    CustomUserSerializer,
+)
 
 
 class CustomUserViewSet(ViewSet):
     permission_classes = (IsAuthenticated,)
 
     @action(
-            methods=["post"],
-            detail=False,
-            url_path="register",
-            permission_classes=(AllowAny,),
-        )
+        methods=["post"],
+        detail=False,
+        url_path="register",
+        permission_classes=(AllowAny,),
+    )
     def register(self, request: DRFRequest):
-            serializer = UserRegistrationSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            
-            user = serializer.save() 
-            
-            response_data = CustomUserSerializer(user).data
-            
-            return DRFResponse(data=response_data, status=201)
+        serializer = UserRegistrationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.save()
+
+        response_data = CustomUserSerializer(user).data
+
+        return DRFResponse(data=response_data, status=HTTP_201_CREATED)
 
     @action(
         methods=("post",),
@@ -43,14 +47,11 @@ class CustomUserViewSet(ViewSet):
         user = serializer.validated_data["user"]
         refresh = RefreshToken.for_user(user)
 
+        response_data = UserLoginSerializer(user).data
+
         return DRFResponse(
             data={
-                "id": user.id,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "is_landlord": user.is_landlord,
-                "is_renter": user.is_renter,
+                **response_data,
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
             },
@@ -76,7 +77,7 @@ class CustomUserViewSet(ViewSet):
             },
             status=HTTP_200_OK,
         )
-    
+
     @action(
         methods=["patch"],
         detail=False,
