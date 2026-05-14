@@ -16,7 +16,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiPara
 from drf_spectacular.types import OpenApiTypes
 
 from apps.reviews.models import Review
-from apps.reviews.serializers import ReviewSerializer
+from apps.reviews.serializers import ReviewReadSerializer, ReviewWriteSerializer
 from .filters import ApartmentFilter
 from .models import Apartment
 from .permissions import IsApartmentOwner, IsLandlordOrReadOnly
@@ -75,7 +75,7 @@ logger = logging.getLogger('apps.properties')
     reviews=extend_schema(
         summary="List reviews for an apartment",
         description="Retrieve all reviews associated with a specific apartment. This endpoint is cached for 60 seconds. Permissions: AllowAny (Read-only).",
-        responses={200: ReviewSerializer(many=True), 404: OpenApiTypes.OBJECT},
+        responses={200: ReviewReadSerializer(many=True), 404: OpenApiTypes.OBJECT},
     ),
 )
 class ApartmentViewSet(viewsets.ViewSet):
@@ -151,5 +151,5 @@ class ApartmentViewSet(viewsets.ViewSet):
         '''Returns all reviews for the given apartment (cached 60 s).'''
         apartment = self.get_object(pk)
         reviews = Review.objects.filter(apartment=apartment).select_related('author')
-        serializer = ReviewSerializer(reviews, many=True)
+        serializer = ReviewReadSerializer(reviews, many=True)
         return Response(serializer.data)
