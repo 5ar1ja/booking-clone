@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 *.pyo
+.pytest_cache
 
 # Django
 db.sqlite3
@@ -21,3 +22,6 @@ venv/
 
 # Ruff
 .ruff_cache
+
+# OS junk
+.DS_Store
