@@ -29,6 +29,7 @@ DJANGO_AND_THIRD_PARTY_APPS = [
 ]
 
 PROJECT_APPS = [
+    'apps.core',
     'apps.users',
     'apps.properties',
     'apps.reviews',
