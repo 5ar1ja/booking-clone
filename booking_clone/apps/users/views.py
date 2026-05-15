@@ -9,17 +9,47 @@ from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 from rest_framework.viewsets import ViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.types import OpenApiTypes
+
 from apps.users.serializers import (
-    CustomUserSerializer,
+    UserReadSerializer,
     UserLoginSerializer,
     UserRegistrationSerializer,
+    UserUpdateSerializer,
+    LoginResponseSerializer,
 )
 
 logger = logging.getLogger('apps.users')
 
 
+@extend_schema_view(
+    register=extend_schema(
+        summary="Register a new user",
+        description="Create a new user account as either a Landlord or a Renter. Permissions: AllowAny.",
+        request=UserRegistrationSerializer,
+        responses={201: UserReadSerializer},
+    ),
+    login=extend_schema(
+        summary="User login",
+        description="Authenticate user with email and password and return JWT tokens. Permissions: AllowAny.",
+        request=UserLoginSerializer,
+        responses={200: LoginResponseSerializer},
+    ),
+    fetch_personal_info=extend_schema(
+        summary="Get personal info",
+        description="Retrieve current authenticated user's profile details. Permissions: Authenticated only.",
+        responses={200: UserReadSerializer},
+    ),
+    update_profile=extend_schema(
+        summary="Update profile",
+        description="Partially update current authenticated user's profile. Permissions: Authenticated only.",
+        request=UserUpdateSerializer,
+        responses={200: UserReadSerializer},
+    ),
+)
 class CustomUserViewSet(ViewSet):
-    '''Handles user registration, login, and profile management.'''
+    '''Handles user registration, login, and profile management using ViewSet.'''
 
     permission_classes = (IsAuthenticated,)
 
@@ -39,7 +69,7 @@ class CustomUserViewSet(ViewSet):
             user.is_landlord,
             user.is_renter,
         )
-        return DRFResponse(data=CustomUserSerializer(user).data, status=HTTP_201_CREATED)
+        return DRFResponse(data=UserReadSerializer(user).data, status=HTTP_201_CREATED)
 
     @action(
         methods=('post',),
@@ -55,19 +85,17 @@ class CustomUserViewSet(ViewSet):
         logger.info('User logged in: %s', user.email)
         refresh = RefreshToken.for_user(user)
 
-        return DRFResponse(
-            data={
-                'id': user.id,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'is_landlord': user.is_landlord,
-                'is_renter': user.is_renter,
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-            },
-            status=HTTP_200_OK,
-        )
+        response_data = {
+            'id': user.id,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'is_landlord': user.is_landlord,
+            'is_renter': user.is_renter,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+        }
+        return DRFResponse(data=response_data, status=HTTP_200_OK)
 
     @action(
         methods=['get'],
@@ -77,17 +105,8 @@ class CustomUserViewSet(ViewSet):
     )
     def fetch_personal_info(self, request: DRFRequest) -> DRFResponse:
         user = request.user
-        return DRFResponse(
-            data={
-                'id': user.id,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'is_landlord': user.is_landlord,
-                'is_renter': user.is_renter,
-            },
-            status=HTTP_200_OK,
-        )
+        serializer = UserReadSerializer(user)
+        return DRFResponse(data=serializer.data, status=HTTP_200_OK)
 
     @action(
         methods=['patch'],
@@ -97,8 +116,10 @@ class CustomUserViewSet(ViewSet):
     )
     def update_profile(self, request: DRFRequest) -> DRFResponse:
         user = request.user
-        serializer = CustomUserSerializer(user, data=request.data, partial=True)
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         logger.info('Profile updated: %s', request.user.email)
-        return DRFResponse(serializer.data, status=HTTP_200_OK)
+        
+        read_serializer = UserReadSerializer(user)
+        return DRFResponse(read_serializer.data, status=HTTP_200_OK)

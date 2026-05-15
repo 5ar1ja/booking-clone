@@ -41,22 +41,62 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    '''Custom user model using email instead of username as the login field.'''
+    '''
+    Custom user model using email instead of username as the login field.
+    Supports two roles: Landlord and Renter.
+    '''
 
-    email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    # avatar = models.ImageField(upload_to='avatar/', null=True, blank=True)
+    email = models.EmailField(
+        unique=True,
+        verbose_name='Email address',
+        help_text='Unique identifier for the user.'
+    )
+    first_name = models.CharField(
+        max_length=255,
+        verbose_name='First name',
+        help_text='User\'s given name.'
+    )
+    last_name = models.CharField(
+        max_length=255,
+        verbose_name='Last name',
+        help_text='User\'s family name.'
+    )
 
-    is_landlord = models.BooleanField(default=False)
-    is_renter = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+    is_landlord = models.BooleanField(
+        default=False,
+        verbose_name='Is landlord',
+        help_text='Designates whether the user can list apartments.'
+    )
+    is_renter = models.BooleanField(
+        default=False,
+        verbose_name='Is renter',
+        help_text='Designates whether the user can book apartments.'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='Is active',
+        help_text='Designates whether this user should be treated as active.'
+    )
+    is_staff = models.BooleanField(
+        default=False,
+        verbose_name='Is staff',
+        help_text='Designates whether the user can log into this admin site.'
+    )
 
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
+        indexes = [
+            models.Index(fields=['email']),
+            models.Index(fields=['is_landlord']),
+            models.Index(fields=['is_renter']),
+        ]
+
     def __str__(self) -> str:
-        return f'{self.email} ({ROLE_LANDLORD if self.is_landlord else ROLE_RENTER})'
+        role = 'Superuser' if self.is_superuser else (ROLE_LANDLORD if self.is_landlord else ROLE_RENTER)
+        return f'{self.email} ({role})'

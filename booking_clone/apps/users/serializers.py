@@ -11,42 +11,22 @@ ERR_ACCOUNT_DISABLED = 'User account is disabled.'
 ERR_MISSING_CREDENTIALS = 'Must include \'email\' and \'password\'.'
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(
-        write_only=True,
-        style={'input_type': 'password'},
-        required=False,
-    )
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    is_landlord = serializers.BooleanField()
-    is_renter = serializers.BooleanField()
-
+class UserReadSerializer(serializers.ModelSerializer):
+    '''Serializer for reading user data (GET requests).'''
+    
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'first_name', 'last_name', 'is_landlord', 'is_renter']
-        read_only_fields = ['is_staff', 'is_superuser']
-
-    def update(self, instance: CustomUser, validated_data: dict) -> CustomUser:
-        password = validated_data.pop('password', None)
-        instance = super().update(instance, validated_data)
-        if password:
-            instance.set_password(password)
-            instance.save(update_fields=['password'])
-        return instance
+        fields = ['id', 'email', 'first_name', 'last_name', 'is_landlord', 'is_renter']
+        read_only_fields = fields
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField()
+    '''Serializer for user registration (POST /register).'''
+    
     password = serializers.CharField(
         write_only=True,
         style={'input_type': 'password'},
     )
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    is_landlord = serializers.BooleanField()
-    is_renter = serializers.BooleanField()
 
     class Meta:
         model = CustomUser
@@ -62,7 +42,31 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return CustomUser.objects.create_user(password=password, **validated_data)
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    '''Serializer for updating user profile (PATCH /update-profile).'''
+    
+    password = serializers.CharField(
+        write_only=True,
+        style={'input_type': 'password'},
+        required=False,
+    )
+
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'password']
+
+    def update(self, instance: CustomUser, validated_data: dict) -> CustomUser:
+        password = validated_data.pop('password', None)
+        instance = super().update(instance, validated_data)
+        if password:
+            instance.set_password(password)
+            instance.save(update_fields=['password'])
+        return instance
+
+
 class UserLoginSerializer(serializers.Serializer):
+    '''Serializer for user login (POST /login).'''
+    
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
@@ -81,3 +85,16 @@ class UserLoginSerializer(serializers.Serializer):
 
         data['user'] = user
         return data
+
+
+class LoginResponseSerializer(serializers.Serializer):
+    '''Serializer for login response (includes JWT tokens).'''
+    
+    id = serializers.IntegerField()
+    email = serializers.EmailField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    is_landlord = serializers.BooleanField()
+    is_renter = serializers.BooleanField()
+    access = serializers.CharField()
+    refresh = serializers.CharField()
