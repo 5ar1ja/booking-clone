@@ -135,6 +135,7 @@ class ApartmentViewSet(viewsets.ViewSet):
             serializer.save(owner=request.user)
             logger.info('Apartment created: owner=%s', request.user.email)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        logger.warning('Apartment creation failed: owner=%s, errors=%s', request.user.email, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
@@ -152,6 +153,7 @@ class ApartmentViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+        logger.warning('Apartment update failed: pk=%s, errors=%s', pk, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request: DRFRequest, pk: Any = None) -> Response:
@@ -162,6 +164,7 @@ class ApartmentViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+        logger.warning('Apartment partial update failed: pk=%s, errors=%s', pk, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request: DRFRequest, pk: Any = None) -> Response:

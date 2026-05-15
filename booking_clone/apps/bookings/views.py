@@ -143,6 +143,7 @@ class BookingViewSet(viewsets.ViewSet):
             )
             read_serializer = BookingReadSerializer(booking)
             return Response(read_serializer.data, status=status.HTTP_201_CREATED)
+        logger.warning('Booking creation failed: user=%s, errors=%s', request.user.email, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
@@ -182,6 +183,7 @@ class BookingViewSet(viewsets.ViewSet):
 
         booking = self.get_object(pk)
         if booking.status == Booking.Status.CANCELLED:
+            logger.warning('Booking %s already cancelled, user=%s', booking.id, request.user.email)
             return Response(
                 {'detail': DETAIL_ALREADY_CANCELLED},
                 status=status.HTTP_400_BAD_REQUEST,

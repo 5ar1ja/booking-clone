@@ -111,6 +111,7 @@ class ReviewViewSet(viewsets.ViewSet):
             user = request.user
 
             if apartment.owner == user:
+                logger.warning('Review forbidden: user=%s tried to review own apartment_id=%s', user.email, apartment.id)
                 return Response({'detail': ERR_OWN_APARTMENT}, status=status.HTTP_403_FORBIDDEN)
 
             stayed = Booking.objects.filter(
@@ -120,6 +121,7 @@ class ReviewViewSet(viewsets.ViewSet):
             ).exists()
 
             if not stayed:
+                logger.warning('Review forbidden: user=%s has not stayed in apartment_id=%s', user.email, apartment.id)
                 return Response({'detail': ERR_NOT_STAYED}, status=status.HTTP_403_FORBIDDEN)
 
             review = serializer.save(author=user)
@@ -131,6 +133,7 @@ class ReviewViewSet(viewsets.ViewSet):
             )
             
             return Response(ReviewReadSerializer(review).data, status=status.HTTP_201_CREATED)
+        logger.warning('Review creation failed: user=%s, errors=%s', request.user, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
@@ -148,6 +151,7 @@ class ReviewViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             review = serializer.save()
             return Response(ReviewReadSerializer(review).data)
+        logger.warning('Review update failed: pk=%s, errors=%s', pk, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request: DRFRequest, pk: Any = None) -> Response:
@@ -158,6 +162,7 @@ class ReviewViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             review = serializer.save()
             return Response(ReviewReadSerializer(review).data)
+        logger.warning('Review partial update failed: pk=%s, errors=%s', pk, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request: DRFRequest, pk: Any = None) -> Response:
