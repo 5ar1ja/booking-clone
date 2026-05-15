@@ -7,6 +7,7 @@ from rest_framework.request import Request as DRFRequest
 from .models import Booking
 from .serializers import BookingSerializer, BookingStatusSerializer
 from .permissions import IsRenterOrReadOnly, IsApartmentOwnerForBooking, IsBookingTenant
+from .tasks import send_booking_confirmation_notification
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -72,7 +73,14 @@ class BookingViewSet(viewsets.ModelViewSet):
     def update_status(self, request: DRFRequest, pk=None) -> Response:
         """Landlord accepts or rejects the booking."""
         booking = self.get_object()
+        old_status = booking.status
+        
         serializer = BookingStatusSerializer(booking, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        
+        # Trigger notification if booking was just accepted
+        if old_status != Booking.Status.ACCEPTED and booking.status == Booking.Status.ACCEPTED:
+            send_booking_confirmation_notification.delay(booking.id)
+            
         return Response(BookingSerializer(booking).data)
