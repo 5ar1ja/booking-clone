@@ -29,7 +29,11 @@ logger = logging.getLogger('apps.properties')
 @extend_schema_view(
     list=extend_schema(
         summary="List all apartments",
-        description="Retrieve a list of all apartments with optional filtering by city, rooms, and price. Permissions: AllowAny (Read-only).",
+        description="Retrieve a list of all apartments with optional filtering by city, rooms, price, and availability dates. Permissions: AllowAny (Read-only).",
+        parameters=[
+            OpenApiParameter(name='check_in', description='Format: YYYY-MM-DD. Filter by availability start date.', required=False, type=OpenApiTypes.DATE),
+            OpenApiParameter(name='check_out', description='Format: YYYY-MM-DD. Filter by availability end date.', required=False, type=OpenApiTypes.DATE),
+        ],
         responses={200: ApartmentReadSerializer(many=True)},
     ),
     create=extend_schema(
