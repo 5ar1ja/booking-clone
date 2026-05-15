@@ -159,3 +159,26 @@ class TestBookingAPI:
         data = {'status': 'invalid_status'}
         response = client.patch(get_booking_status_url(booking.id), data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_update_status_confirmed_triggers_email(self, auth_client, landlord, booking, mocker):
+        """Good case: Confirming a booking triggers the background email task."""
+        # Mock the celery task
+        mock_task = mocker.patch('apps.bookings.tasks.send_booking_confirmation_email.delay')
+        
+        client = auth_client(landlord)
+        data = {'status': 'confirmed'}
+        
+        # We use a context manager or manually trigger on_commit because 
+        # TestCase/TransactionTestCase handles it differently.
+        # For simplicity in this test, we verify the logic reaches the trigger.
+        response = client.patch(get_booking_status_url(booking.id), data)
+        
+        assert response.status_code == status.HTTP_200_OK
+        
+        # Manually trigger on_commit callbacks for the test
+        from django.db import transaction
+        for callback in transaction.get_connection().run_on_commit:
+            callback[1]() # execute the lambda
+            
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == booking.id

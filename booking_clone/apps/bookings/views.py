@@ -178,11 +178,21 @@ class BookingViewSet(viewsets.ViewSet):
         booking = self.get_object(pk)
         serializer = BookingStatusSerializer(booking, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
+        
+        new_status = serializer.validated_data.get('status')
         serializer.save()
+        
+        # Trigger delayed email task if status is CONFIRMED
+        if new_status == Booking.Status.CONFIRMED:
+            from django.db import transaction
+            from .tasks import send_booking_confirmation_email
+            transaction.on_commit(lambda: send_booking_confirmation_email.delay(booking.id))
+            logger.info('Booking #%s confirmed, email task queued.', booking.id)
+
         logger.info(
             'Booking #%s status → %s by landlord=%s',
             booking.id,
-            serializer.validated_data.get('status'),
+            new_status,
             request.user.email,
         )
         return Response(BookingReadSerializer(booking).data)

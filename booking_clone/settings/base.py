@@ -26,6 +26,7 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     'drf_spectacular',
     'django_filters',
     'debug_toolbar',
+    'django_celery_beat',
 ]
 
 PROJECT_APPS = [
@@ -37,6 +38,18 @@ PROJECT_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
+
+# Celery Configuration Options
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# Email Configuration (using console backend for development)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'support@booking-clone.com'
 
 
 MIDDLEWARE = [
