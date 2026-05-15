@@ -25,7 +25,6 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'django_filters',
-    'debug_toolbar',
 ]
 
 PROJECT_APPS = [
@@ -47,7 +46,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 TEMPLATES = [
@@ -88,10 +86,10 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

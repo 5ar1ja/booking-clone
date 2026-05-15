@@ -10,8 +10,8 @@ x-app: &app
 services:
   redis:
     image: redis:7-alpine
-    ports:
-      - "6380:6379"
+    expose:
+      - "6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -31,19 +31,22 @@ services:
 
   celery_worker:
     <<: *app
-    command: celery -A settings worker -l info
+    entrypoint: []
+    command: sh -c "celery -A settings.celery worker -l info"
     volumes:
       - sqlite_data:/app/data
 
   celery_beat:
     <<: *app
-    command: celery -A settings beat -l info
+    entrypoint: []
+    command: sh -c "celery -A settings.celery beat -l info"
     volumes:
       - sqlite_data:/app/data
 
   flower:
     <<: *app
-    command: celery -A settings flower --basic-auth=$${FLOWER_USER}:$${FLOWER_PASSWORD}
+    entrypoint: []
+    command: sh -c "celery -A settings.celery flower --basic-auth=$${FLOWER_USER}:$${FLOWER_PASSWORD}"
     ports:
       - "5555:5555"
 
