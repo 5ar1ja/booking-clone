@@ -92,19 +92,27 @@ class ApartmentViewSet(viewsets.ViewSet):
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
+        '''Return apartments with related city, country, and owner data to optimize queries.'''
+
         return Apartment.objects.select_related('city', 'city__country', 'owner').all()
 
     def get_object(self, pk):
+        '''Helper method to retrieve an apartment by primary key with proper permissions.'''
+
         obj = get_object_or_404(self.get_queryset(), pk=pk)
         self.check_object_permissions(self.request, obj)
         return obj
 
     def get_permissions(self):
+        '''Return the list of permissions based on the action.'''
+
         if self.action in ['update', 'partial_update', 'destroy']:
             return [IsAuthenticatedOrReadOnly(), IsLandlordOrReadOnly(), IsApartmentOwner()]
         return super().get_permissions()
 
     def list(self, request: DRFRequest) -> Response:
+        '''List apartments with optional filtering and pagination. Permissions: AllowAny (Read-only).'''
+
         queryset = self.get_queryset()
         
         backend = DjangoFilterBackend()
@@ -120,6 +128,8 @@ class ApartmentViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request: DRFRequest) -> Response:
+        '''Create a new apartment listing. Permissions: Authenticated Landlords only.'''
+
         serializer = ApartmentWriteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(owner=request.user)
@@ -128,11 +138,15 @@ class ApartmentViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Retrieve details of a specific apartment. Permissions: AllowAny (Read-only).'''
+
         apartment = self.get_object(pk)
         serializer = ApartmentReadSerializer(apartment)
         return Response(serializer.data)
 
     def update(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Update an existing apartment. Permissions: Authenticated Landlord who owns the apartment.'''
+
         apartment = self.get_object(pk)
         serializer = ApartmentWriteSerializer(apartment, data=request.data)
         if serializer.is_valid():
@@ -141,6 +155,8 @@ class ApartmentViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Partially update an existing apartment. Permissions: Authenticated Landlord who owns the apartment.'''
+
         apartment = self.get_object(pk)
         serializer = ApartmentWriteSerializer(apartment, data=request.data, partial=True)
         if serializer.is_valid():
@@ -149,6 +165,8 @@ class ApartmentViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Delete an apartment listing. Permissions: Authenticated Landlord who owns the apartment.'''
+
         apartment = self.get_object(pk)
         apartment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -157,6 +175,7 @@ class ApartmentViewSet(viewsets.ViewSet):
     @action(detail=True, methods=['get'])
     def reviews(self, request: DRFRequest, pk: Any = None) -> Response:
         '''Returns all reviews for the given apartment (cached 60 s).'''
+        
         apartment = self.get_object(pk)
         reviews = Review.objects.filter(apartment=apartment).select_related('author')
         
