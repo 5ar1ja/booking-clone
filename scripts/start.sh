@@ -5,6 +5,7 @@ set -o pipefail
 # ----------------------------------
 # CONFIGURATION
 # ----------------------------------
+
 ENV_FILE=".env"
 VENV_DIR=".venv"
 APP_DIR="booking_clone"
@@ -120,6 +121,7 @@ start_server() {
 # ----------------------------------
 # SCRIPT EXECUTION
 # ----------------------------------
+
 check_env_vars
 create_virtualenv
 run_migrations
