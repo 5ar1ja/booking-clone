@@ -88,6 +88,8 @@ class BookingViewSet(viewsets.ViewSet):
     pagination_class = StandardResultsSetPagination
 
     def get_permissions(self) -> list[BasePermission]:
+        '''Return the list of permissions based on the action.'''
+
         if self.action == ACTION_CANCEL:
             return [IsAuthenticated(), IsBookingTenant()]
         if self.action == ACTION_UPDATE_STATUS:
@@ -95,6 +97,8 @@ class BookingViewSet(viewsets.ViewSet):
         return [permission() for permission in self.permission_classes]
 
     def get_queryset(self) -> QuerySet[Booking]:
+        '''Return the queryset of bookings based on the user's role.'''
+
         user = self.request.user
         if user.is_landlord:
             return Booking.objects.filter(
@@ -105,12 +109,16 @@ class BookingViewSet(viewsets.ViewSet):
         ).select_related('tenant', 'apartment')
 
     def get_object(self, pk: Any = None) -> Booking:
+        '''Return the booking object for the given primary key.'''
+
         queryset = self.get_queryset()
         obj = get_object_or_404(queryset, pk=pk)
         self.check_object_permissions(self.request, obj)
         return obj
 
     def list(self, request: DRFRequest) -> Response:
+        '''List bookings for the authenticated user.'''
+
         queryset = self.get_queryset()
         
         paginator = self.pagination_class()
@@ -123,6 +131,8 @@ class BookingViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request: DRFRequest) -> Response:
+        '''Create a new booking. Only renters can create bookings.'''
+
         serializer = BookingWriteSerializer(data=request.data)
         if serializer.is_valid():
             booking = serializer.save(tenant=request.user)
@@ -136,23 +146,31 @@ class BookingViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Retrieve a specific booking.'''
+
         booking = self.get_object(pk)
         serializer = BookingReadSerializer(booking)
         return Response(serializer.data)
 
     def update(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Full updates are not allowed. Use /cancel/ or /update-status/.'''
+
         return Response(
             {'detail': DETAIL_FULL_UPDATE_NOT_ALLOWED},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
 
     def partial_update(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Partial updates are not allowed. Use /cancel/ or /update-status/ instead.'''
+
         return Response(
             {'detail': DETAIL_PARTIAL_UPDATE_NOT_ALLOWED},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
 
     def destroy(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Deletions are not allowed. Use the /cancel/ action instead.'''
+
         return Response(
             {'detail': DETAIL_DELETE_NOT_ALLOWED},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
@@ -161,6 +179,7 @@ class BookingViewSet(viewsets.ViewSet):
     @action(methods=['patch'], detail=True, url_path='cancel')
     def cancel(self, request: DRFRequest, pk: Any = None) -> Response:
         '''Renter cancels their own booking.'''
+
         booking = self.get_object(pk)
         if booking.status == Booking.Status.CANCELLED:
             return Response(
@@ -175,6 +194,7 @@ class BookingViewSet(viewsets.ViewSet):
     @action(methods=['patch'], detail=True, url_path='update-status')
     def update_status(self, request: DRFRequest, pk: Any = None) -> Response:
         '''Landlord accepts or rejects the booking.'''
+        
         booking = self.get_object(pk)
         serializer = BookingStatusSerializer(booking, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
