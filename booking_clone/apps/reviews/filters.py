@@ -3,6 +3,7 @@ from .models import Review
 
 
 class ReviewFilter(django_filters.FilterSet):
+    '''Filter reviews by apartment, author, and rating range.'''
 
     min_rating = django_filters.NumberFilter(
         field_name='rating',

@@ -74,14 +74,20 @@ class ReviewViewSet(viewsets.ViewSet):
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
+        '''Return the queryset of reviews, optimized with select_related for author and apartment.'''
+
         return Review.objects.select_related('author', 'apartment').all()
 
     def get_object(self, pk):
+        '''Helper method to retrieve a review by primary key with proper permissions.'''
+
         obj = get_object_or_404(self.get_queryset(), pk=pk)
         self.check_object_permissions(self.request, obj)
         return obj
 
     def list(self, request: DRFRequest) -> Response:
+        '''List reviews with optional filtering and pagination. Permissions: AllowAny (Read-only).'''
+
         queryset = self.get_queryset()
         
         backend = DjangoFilterBackend()
@@ -97,6 +103,8 @@ class ReviewViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request: DRFRequest) -> Response:
+        '''Create a new review. Permissions: Authenticated users who stayed in the apartment.'''
+
         serializer = ReviewWriteSerializer(data=request.data)
         if serializer.is_valid():
             apartment = serializer.validated_data['apartment']
@@ -126,11 +134,15 @@ class ReviewViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Retrieve details of a specific review. Permissions: AllowAny (Read-only).'''
+
         review = self.get_object(pk)
         serializer = ReviewReadSerializer(review)
         return Response(serializer.data)
 
     def update(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Update an existing review. Permissions: Authenticated author of the review.'''
+
         review = self.get_object(pk)
         serializer = ReviewWriteSerializer(review, data=request.data)
         if serializer.is_valid():
@@ -139,6 +151,8 @@ class ReviewViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Partially update an existing review. Permissions: Authenticated author of the review.'''
+
         review = self.get_object(pk)
         serializer = ReviewWriteSerializer(review, data=request.data, partial=True)
         if serializer.is_valid():
@@ -147,6 +161,8 @@ class ReviewViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Delete an existing review. Permissions: Authenticated author of the review.'''
+
         review = self.get_object(pk)
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
