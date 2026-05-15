@@ -47,6 +47,16 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
+# Celery Beat Configuration
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'cleanup-stale-bookings-every-hour': {
+        'task': 'apps.bookings.tasks.cleanup_stale_bookings',
+        'schedule': crontab(minute=0), # Every hour at minute 0
+    },
+}
+
 # Email Configuration (using console backend for development)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'support@booking-clone.com'
