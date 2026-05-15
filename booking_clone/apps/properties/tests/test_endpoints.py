@@ -220,7 +220,7 @@ class TestApartmentEndpoints:
 
     # --- AVAILABILITY ACTION ---
     def test_apartment_availability_success(self, api_client, apartment, renter):
-        """Good case: Retrieve busy date ranges for an apartment."""
+        """Good case: Retrieve apartment info along with busy date ranges."""
         from datetime import date, timedelta
         from apps.bookings.models import Booking
         
@@ -239,7 +239,12 @@ class TestApartmentEndpoints:
         response = api_client.get(url)
         
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        # DRF response data for values() includes the actual date objects
-        assert response.data[0]['check_in'] == check_in
-        assert response.data[0]['check_out'] == check_out
+        
+        # Check apartment info part
+        assert response.data['apartment']['id'] == apartment.id
+        assert response.data['apartment']['title'] == apartment.title
+        
+        # Check busy dates part
+        assert len(response.data['busy_dates']) == 1
+        assert response.data['busy_dates'][0]['check_in'] == check_in
+        assert response.data['busy_dates'][0]['check_out'] == check_out

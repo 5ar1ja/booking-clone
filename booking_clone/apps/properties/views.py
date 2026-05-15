@@ -85,18 +85,25 @@ logger = logging.getLogger('apps.properties')
     ),
     availability=extend_schema(
         summary="List busy dates for an apartment",
-        description="Returns a list of date ranges that are already booked or pending for this apartment.",
+        description="Returns apartment details along with a list of date ranges that are already booked or pending.",
         responses={200: OpenApiTypes.OBJECT},
         examples=[
             OpenApiExample(
                 'Availability Example',
-                value=[
-                    {'check_in': '2024-06-01', 'check_out': '2024-06-10'},
-                    {'check_in': '2024-07-15', 'check_out': '2024-07-20'}
-                ]
+                value={
+                    'apartment': {
+                        'id': 1,
+                        'title': 'Luxury Penthouse',
+                        'price_per_night': '250.00'
+                    },
+                    'busy_dates': [
+                        {'check_in': '2024-06-01', 'check_out': '2024-06-10'},
+                        {'check_in': '2024-07-15', 'check_out': '2024-07-20'}
+                    ]
+                }
             )
         ]
-    )
+    ),
 )
 class ApartmentViewSet(viewsets.ViewSet):
     '''
@@ -190,12 +197,18 @@ class ApartmentViewSet(viewsets.ViewSet):
 
     @action(detail=True, methods=['get'])
     def availability(self, request: DRFRequest, pk: Any = None) -> Response:
-        '''Returns a list of occupied date ranges for the apartment.'''
+        '''Returns apartment info along with occupied date ranges.'''
         apartment = self.get_object(pk)
+        
         # We only care about bookings that actually block the calendar
         busy_bookings = Booking.objects.filter(
             apartment=apartment,
             status__in=[Booking.Status.PENDING, Booking.Status.CONFIRMED]
         ).values('check_in', 'check_out').order_by('check_in')
         
-        return Response(list(busy_bookings))
+        serializer = ApartmentReadSerializer(apartment)
+        
+        return Response({
+            'apartment': serializer.data,
+            'busy_dates': list(busy_bookings)
+        })
