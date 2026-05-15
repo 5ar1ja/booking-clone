@@ -8,7 +8,7 @@ ERR_CHECKIN_PAST = 'check_in cannot be in the past'
 ERR_CHECKOUT_BEFORE_CHECKIN = 'check_out must be after check_in'
 
 
-class BookingSerializer(serializers.ModelSerializer):
+class BookingReadSerializer(serializers.ModelSerializer):
     tenant = serializers.ReadOnlyField(source='tenant.email')
     apartment_title = serializers.ReadOnlyField(source='apartment.title')
 
@@ -26,6 +26,16 @@ class BookingSerializer(serializers.ModelSerializer):
             'created_at',
         ]
         read_only_fields = ['tenant', 'status', 'total_price', 'created_at']
+
+
+class BookingWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        fields = [
+            'apartment',
+            'check_in',
+            'check_out',
+        ]
 
     def validate(self, data: dict) -> dict:
         check_in = data.get('check_in')

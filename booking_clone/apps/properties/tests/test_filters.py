@@ -11,7 +11,7 @@ class ApartmentFilterTests(BaseApartmentTest):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(len(response.data['results']), 3)
 
     def test_filter_by_city(self):
 
@@ -20,29 +20,29 @@ class ApartmentFilterTests(BaseApartmentTest):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # self.assertEqual(len(response.data), 1)
-        self.assertEqual(len(response.data), 2)  # 2 Almaty, not Astana
+        # self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(len(response.data['results']), 2)  # 2 Almaty, not Astana
 
     def test_filter_by_min_price(self):
 
         response = self.client.get('/properties/apartments/?min_price=400')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data['results']), 2)
 
     def test_filter_by_max_price(self):
 
         response = self.client.get('/properties/apartments/?max_price=500')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data['results']), 2)
 
     def test_filter_by_rooms(self):
 
         response = self.client.get('/properties/apartments/?rooms=2')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
     def test_filter_combination(self):
         # Almaty + Price < 400
@@ -52,5 +52,5 @@ class ApartmentFilterTests(BaseApartmentTest):
         }
         response = self.client.get('/properties/apartments/', params)
 
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['title'], 'Almaty Budget')
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['title'], 'Almaty Budget')

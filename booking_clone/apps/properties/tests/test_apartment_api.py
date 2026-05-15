@@ -10,7 +10,7 @@ class ApartmentAPITests(BaseApartmentTest):
         response = self.client.get('/properties/apartments/')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(len(response.data['results']), 3)
 
     def test_landlord_can_create_apartment(self):
 

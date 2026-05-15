@@ -11,13 +11,13 @@ class TestReviewAPI:
         url = reverse('review-list')
         response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
+        assert len(response.data['results']) == 1
 
     def test_list_reviews_filter_by_apartment(self, api_client, review):
         url = reverse('review-list')
         response = api_client.get(url, {'apartment': review.apartment.id})
         assert response.status_code == status.HTTP_200_OK
-        assert response.data[0]['apartment'] == review.apartment.id
+        assert response.data['results'][0]['apartment'] == review.apartment.id
 
     def test_list_reviews_filter_invalid_apartment(self, api_client, review):
         # django-filter validates if the ID exists in the queryset of the model

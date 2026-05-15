@@ -14,8 +14,8 @@ class TestApartmentEndpoints:
         url = reverse('apartment-list')
         response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]['title'] == apartment.title
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['title'] == apartment.title
 
     def test_list_apartments_invalid_method(self, api_client, landlord):
         api_client.force_authenticate(user=landlord)
@@ -185,7 +185,7 @@ class TestApartmentEndpoints:
         url = reverse('apartment-reviews', kwargs={'pk': apartment.pk})
         response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
-        assert isinstance(response.data, list)
+        assert isinstance(response.data['results'], list)
 
     def test_apartment_reviews_not_found(self, api_client):
         url = reverse('apartment-reviews', kwargs={'pk': 9999})
