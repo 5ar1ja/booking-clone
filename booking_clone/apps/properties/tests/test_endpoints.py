@@ -217,3 +217,29 @@ class TestApartmentEndpoints:
         url = reverse('apartment-reviews', kwargs={'pk': apartment.pk})
         response = api_client.post(url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+    # --- AVAILABILITY ACTION ---
+    def test_apartment_availability_success(self, api_client, apartment, renter):
+        """Good case: Retrieve busy date ranges for an apartment."""
+        from datetime import date, timedelta
+        from apps.bookings.models import Booking
+        
+        check_in = date.today() + timedelta(days=1)
+        check_out = date.today() + timedelta(days=5)
+        
+        Booking.objects.create(
+            tenant=renter,
+            apartment=apartment,
+            check_in=check_in,
+            check_out=check_out,
+            status=Booking.Status.CONFIRMED
+        )
+        
+        url = reverse('apartment-availability', kwargs={'pk': apartment.pk})
+        response = api_client.get(url)
+        
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 1
+        # DRF response data for values() includes the actual date objects
+        assert response.data[0]['check_in'] == check_in
+        assert response.data[0]['check_out'] == check_out

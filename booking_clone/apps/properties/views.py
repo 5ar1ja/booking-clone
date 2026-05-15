@@ -16,6 +16,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiPara
 from drf_spectacular.types import OpenApiTypes
 
 from apps.core.pagination import StandardResultsSetPagination
+from apps.bookings.models import Booking
 from apps.reviews.models import Review
 from apps.reviews.serializers import ReviewReadSerializer
 from .filters import ApartmentFilter
@@ -82,6 +83,20 @@ logger = logging.getLogger('apps.properties')
         description="Retrieve all reviews associated with a specific apartment. This endpoint is cached for 60 seconds. Permissions: AllowAny (Read-only).",
         responses={200: ReviewReadSerializer(many=True), 404: OpenApiTypes.OBJECT},
     ),
+    availability=extend_schema(
+        summary="List busy dates for an apartment",
+        description="Returns a list of date ranges that are already booked or pending for this apartment.",
+        responses={200: OpenApiTypes.OBJECT},
+        examples=[
+            OpenApiExample(
+                'Availability Example',
+                value=[
+                    {'check_in': '2024-06-01', 'check_out': '2024-06-10'},
+                    {'check_in': '2024-07-15', 'check_out': '2024-07-20'}
+                ]
+            )
+        ]
+    )
 )
 class ApartmentViewSet(viewsets.ViewSet):
     '''
@@ -172,3 +187,15 @@ class ApartmentViewSet(viewsets.ViewSet):
 
         serializer = ReviewReadSerializer(reviews, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['get'])
+    def availability(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Returns a list of occupied date ranges for the apartment.'''
+        apartment = self.get_object(pk)
+        # We only care about bookings that actually block the calendar
+        busy_bookings = Booking.objects.filter(
+            apartment=apartment,
+            status__in=[Booking.Status.PENDING, Booking.Status.CONFIRMED]
+        ).values('check_in', 'check_out').order_by('check_in')
+        
+        return Response(list(busy_bookings))
