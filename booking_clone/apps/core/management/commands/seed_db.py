@@ -9,13 +9,19 @@ from apps.bookings.models import Booking
 from apps.reviews.models import Review
 
 class Command(BaseCommand):
+    '''Django management command to seed the database with sample data for testing and development.'''
+
     help = 'Seeds the database with sample data'
 
     def add_arguments(self, parser):
+        '''Add optional argument to clear existing data before seeding.'''
+
         parser.add_argument('--clear', action='store_true', help='Clear existing data before seeding')
 
     @transaction.atomic
     def handle(self, *args, **options):
+        '''Seed the database with sample users, countries, cities, apartments, bookings, and reviews.'''
+
         if options['clear']:
             self.stdout.write('Clearing existing data...')
             Review.objects.all().delete()

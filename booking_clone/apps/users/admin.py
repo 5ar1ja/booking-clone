@@ -6,6 +6,8 @@ from apps.users.models import CustomUser
 
 @register(CustomUser)
 class CustomUserAdmin(UserAdmin):
+    '''Admin interface for the CustomUser model.'''
+
     list_display = (
         'email', 'first_name', 'last_name',
         'is_landlord', 'is_renter', 'is_active', 'is_staff', 'is_superuser',

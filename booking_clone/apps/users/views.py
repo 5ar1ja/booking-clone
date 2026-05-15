@@ -30,6 +30,8 @@ class CustomUserViewSet(ViewSet):
         permission_classes=(AllowAny,),
     )
     def register(self, request: DRFRequest) -> DRFResponse:
+        '''Register a new user with email, password, and role (landlord or renter).'''
+
         serializer = UserRegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -48,6 +50,8 @@ class CustomUserViewSet(ViewSet):
         permission_classes=(AllowAny,),
     )
     def login(self, request: DRFRequest, *args: Any, **kwargs: Any) -> DRFResponse:
+        '''Authenticate user and return JWT tokens along with user info.'''
+
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -76,6 +80,8 @@ class CustomUserViewSet(ViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def fetch_personal_info(self, request: DRFRequest) -> DRFResponse:
+        '''Fetch the authenticated user's personal information. Permissions: Authenticated users only.'''
+
         user = request.user
         return DRFResponse(
             data={
@@ -96,6 +102,8 @@ class CustomUserViewSet(ViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def update_profile(self, request: DRFRequest) -> DRFResponse:
+        '''Update the authenticated user's profile information. Permissions: Authenticated users only.'''
+
         user = request.user
         serializer = CustomUserSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
