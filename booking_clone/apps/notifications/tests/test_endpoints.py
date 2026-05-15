@@ -104,6 +104,33 @@ class TestNotificationEndpoints:
         assert len(response.data) == 1
         assert response.data[0]['message'] == 'For landlord'
 
+    def test_notification_list_filters_by_read_status(
+        self,
+        auth_client,
+        landlord,
+        booking,
+    ):
+        Notification.objects.create(
+            user=landlord,
+            booking=booking,
+            event_type=Notification.EventType.BOOKING_CREATED,
+            message='Unread',
+        )
+        Notification.objects.create(
+            user=landlord,
+            booking=booking,
+            event_type=Notification.EventType.BOOKING_CANCELLED,
+            message='Read',
+            is_read=True,
+        )
+
+        client = auth_client(landlord)
+        response = client.get(NOTIFICATION_LIST_URL, {'is_read': 'false'})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 1
+        assert response.data[0]['message'] == 'Unread'
+
     def test_mark_notification_read(self, auth_client, landlord, booking):
         notification = Notification.objects.create(
             user=landlord,

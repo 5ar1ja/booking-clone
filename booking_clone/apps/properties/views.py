@@ -18,6 +18,7 @@ from drf_spectacular.types import OpenApiTypes
 from apps.core.pagination import StandardResultsSetPagination
 from apps.bookings.models import Booking
 from apps.reviews.models import Review
+from apps.reviews.filters import ReviewFilter
 from apps.reviews.serializers import ReviewReadSerializer
 from .filters import ApartmentFilter
 from .models import Apartment
@@ -30,7 +31,7 @@ logger = logging.getLogger('apps.properties')
 @extend_schema_view(
     list=extend_schema(
         summary="List all apartments",
-        description="Retrieve a list of all apartments with optional filtering by city, rooms, price, and availability dates. Permissions: AllowAny (Read-only).",
+        description="Retrieve a list of all apartments with optional filtering by city, rooms, price, and availability dates. Permissions: AllowAny (Read-only)",
         parameters=[
             OpenApiParameter(name='check_in', description='Format: YYYY-MM-DD. Filter by availability start date.', required=False, type=OpenApiTypes.DATE),
             OpenApiParameter(name='check_out', description='Format: YYYY-MM-DD. Filter by availability end date.', required=False, type=OpenApiTypes.DATE),
@@ -39,9 +40,9 @@ logger = logging.getLogger('apps.properties')
     ),
     create=extend_schema(
         summary="Create a new apartment",
-        description="Add a new apartment listing to the platform. Permissions: Authenticated Landlords only.",
+        description="Add a new apartment listing to the platform. Permissions: Authenticated Landlords only",
         request=ApartmentWriteSerializer,
-        responses={201: ApartmentWriteSerializer, 400: OpenApiTypes.OBJECT},
+        responses={201: ApartmentReadSerializer, 400: OpenApiTypes.OBJECT},
         examples=[
             OpenApiExample(
                 'Apartment Creation Example',
@@ -58,34 +59,34 @@ logger = logging.getLogger('apps.properties')
     ),
     retrieve=extend_schema(
         summary="Retrieve apartment details",
-        description="Get detailed information about a specific apartment by its ID. Permissions: AllowAny (Read-only).",
+        description="Get detailed information about a specific apartment by its ID. Permissions: AllowAny (Read-only)",
         responses={200: ApartmentReadSerializer, 404: OpenApiTypes.OBJECT},
     ),
     update=extend_schema(
         summary="Update an apartment",
-        description="Update all fields of an existing apartment. Permissions: Authenticated Landlord who owns the apartment.",
+        description="Update all fields of an existing apartment. Permissions: Authenticated Landlord who owns the apartment",
         request=ApartmentWriteSerializer,
-        responses={200: ApartmentWriteSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
+        responses={200: ApartmentReadSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
     ),
     partial_update=extend_schema(
         summary="Partially update an apartment",
-        description="Update specific fields of an existing apartment. Permissions: Authenticated Landlord who owns the apartment.",
+        description="Update specific fields of an existing apartment. Permissions: Authenticated Landlord who owns the apartment",
         request=ApartmentWriteSerializer,
-        responses={200: ApartmentWriteSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
+        responses={200: ApartmentReadSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
     ),
     destroy=extend_schema(
         summary="Delete an apartment",
-        description="Remove an apartment listing from the platform. Permissions: Authenticated Landlord who owns the apartment.",
+        description="Remove an apartment listing from the platform. Permissions: Authenticated Landlord who owns the apartment",
         responses={204: None, 403: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
     ),
     reviews=extend_schema(
         summary="List reviews for an apartment",
-        description="Retrieve all reviews associated with a specific apartment. This endpoint is cached for 60 seconds. Permissions: AllowAny (Read-only).",
+        description="Retrieve all reviews associated with a specific apartment. This endpoint is cached for 60 seconds. Permissions: AllowAny (Read-only)",
         responses={200: ReviewReadSerializer(many=True), 404: OpenApiTypes.OBJECT},
     ),
     availability=extend_schema(
         summary="List busy dates for an apartment",
-        description="Returns apartment details along with a list of date ranges that are already booked or pending.",
+        description="Returns apartment details along with a list of date ranges that are already booked or pending",
         responses={200: OpenApiTypes.OBJECT},
         examples=[
             OpenApiExample(
@@ -148,9 +149,12 @@ class ApartmentViewSet(viewsets.ViewSet):
     def create(self, request: DRFRequest) -> Response:
         serializer = ApartmentWriteSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(owner=request.user)
+            apartment = serializer.save(owner=request.user)
             logger.info('Apartment created: owner=%s', request.user.email)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                ApartmentReadSerializer(apartment).data,
+                status=status.HTTP_201_CREATED,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
@@ -162,16 +166,16 @@ class ApartmentViewSet(viewsets.ViewSet):
         apartment = self.get_object(pk)
         serializer = ApartmentWriteSerializer(apartment, data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            apartment = serializer.save()
+            return Response(ApartmentReadSerializer(apartment).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request: DRFRequest, pk: Any = None) -> Response:
         apartment = self.get_object(pk)
         serializer = ApartmentWriteSerializer(apartment, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+            apartment = serializer.save()
+            return Response(ApartmentReadSerializer(apartment).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request: DRFRequest, pk: Any = None) -> Response:
@@ -185,6 +189,7 @@ class ApartmentViewSet(viewsets.ViewSet):
         '''Returns all reviews for the given apartment (cached 60 s).'''
         apartment = self.get_object(pk)
         reviews = Review.objects.filter(apartment=apartment).select_related('author')
+        reviews = ReviewFilter(request.GET, queryset=reviews).qs
         
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(reviews, request, view=self)
@@ -200,7 +205,7 @@ class ApartmentViewSet(viewsets.ViewSet):
         '''Returns apartment info along with occupied date ranges.'''
         apartment = self.get_object(pk)
         
-        # We only care about bookings that actually block the calendar
+        # only care about bookings that actually block the calendar
         busy_bookings = Booking.objects.filter(
             apartment=apartment,
             status__in=[Booking.Status.PENDING, Booking.Status.CONFIRMED]

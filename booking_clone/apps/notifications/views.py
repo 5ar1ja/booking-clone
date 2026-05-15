@@ -4,14 +4,20 @@ from typing import AsyncGenerator
 
 from asgiref.sync import sync_to_async
 from django.http import HttpResponse, StreamingHttpResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from .filters import NotificationFilter
 from .models import Notification
-from .serializers import NotificationSerializer
+from .serializers import (
+    NotificationMarkAllReadResponseSerializer,
+    NotificationMarkReadSerializer,
+    NotificationReadSerializer,
+)
 from .utils import format_sse_event, get_user_from_jwt
 
 logger = logging.getLogger('apps.notifications')
@@ -24,26 +30,40 @@ class NotificationViewSet(
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet,
 ):
-    '''Lists authenticated user notifications and allows marking them as read.'''
+    '''lists authenticated user notifications and allows marking them as read'''
 
     permission_classes = [IsAuthenticated]
-    serializer_class = NotificationSerializer
+    serializer_class = NotificationReadSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = NotificationFilter
 
     def get_queryset(self):
         return Notification.objects.filter(user=self.request.user).select_related('booking')
 
     @action(methods=['patch'], detail=True, url_path='mark-read')
     def mark_read(self, request: Request, pk=None) -> Response:
+        serializer = NotificationMarkReadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         notification = self.get_object()
         if not notification.is_read:
             notification.is_read = True
             notification.save(update_fields=['is_read'])
-        return Response(self.get_serializer(notification).data, status=status.HTTP_200_OK)
+        return Response(
+            NotificationReadSerializer(notification).data,
+            status=status.HTTP_200_OK,
+        )
 
     @action(methods=['patch'], detail=False, url_path='mark-all-read')
     def mark_all_read(self, request: Request) -> Response:
+        serializer = NotificationMarkReadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
         updated = self.get_queryset().filter(is_read=False).update(is_read=True)
-        return Response({'updated': updated}, status=status.HTTP_200_OK)
+        response_serializer = NotificationMarkAllReadResponseSerializer(
+            {'updated': updated}
+        )
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 def _extract_token(request) -> str | None:
@@ -76,10 +96,10 @@ async def notification_event_generator(
     *,
     last_event_id: int = 0,
 ) -> AsyncGenerator[str, None]:
-    '''Replays missed notifications and keeps polling for new ones.'''
+    '''replays missed notifications and keeps polling for new ones'''
 
     current_event_id = last_event_id
-    logger.info('User %s subscribed to SSE stream from event %s.', user_id, last_event_id)
+    logger.info('User %s subscribed to SSE stream from event %s', user_id, last_event_id)
     yield 'event: connected\ndata: {"info":"Connected to notification stream"}\n\n'
 
     while True:
@@ -97,9 +117,7 @@ async def notification_event_generator(
         await asyncio.sleep(SSE_POLL_INTERVAL_SECONDS)
 
 async def stream_notifications(request):
-    '''
-    Async SSE endpoint with JWT auth and replay support via Last-Event-ID.
-    '''
+    '''async SSE endpoint with JWT auth and replay support cherez Last-Event-ID'''
     token = _extract_token(request)
     if not token:
         return HttpResponse('Unauthorized', status=401)

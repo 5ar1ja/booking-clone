@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from django.db.models import QuerySet
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
@@ -17,6 +18,7 @@ from drf_spectacular.types import OpenApiTypes
 from apps.core.pagination import StandardResultsSetPagination
 from apps.notifications.models import Notification
 from apps.notifications.utils import notify_after_commit
+from .filters import BookingFilter
 from .models import Booking
 from .permissions import IsApartmentOwnerForBooking, IsBookingTenant, IsRenterOrReadOnly
 from .serializers import BookingReadSerializer, BookingWriteSerializer, BookingStatusSerializer
@@ -59,44 +61,44 @@ def build_booking_notification_metadata(
 @extend_schema_view(
     list=extend_schema(
         summary="List bookings",
-        description="Retrieve a list of bookings. Landlords see bookings for their apartments, tenants see their own bookings.",
+        description="Retrieve a list of bookings. Landlords see bookings for their apartments, tenants see their own bookings",
         responses={200: BookingReadSerializer(many=True)},
     ),
     create=extend_schema(
         summary="Create a new booking",
-        description="Create a new booking for an apartment. Permissions: Authenticated Renters.",
+        description="Create a new booking for an apartment. Permissions: Authenticated Renters",
         request=BookingWriteSerializer,
         responses={201: BookingReadSerializer, 400: OpenApiTypes.OBJECT},
     ),
     retrieve=extend_schema(
         summary="Retrieve booking details",
-        description="Get detailed information about a specific booking.",
+        description="Get detailed information about a specific booking",
         responses={200: BookingReadSerializer, 404: OpenApiTypes.OBJECT},
     ),
     update=extend_schema(
         summary="Update a booking (Disabled)",
-        description="Full updates are not allowed. Use /cancel/ or /update-status/.",
+        description="Full updates are not allowed. Use /cancel/ or /update-status/",
         responses={405: OpenApiTypes.OBJECT},
     ),
     partial_update=extend_schema(
         summary="Partially update a booking (Disabled)",
-        description="Partial updates are not allowed. Use /cancel/ or /update-status/.",
+        description="Partial updates are not allowed. Use /cancel/ or /update-status/",
         responses={405: OpenApiTypes.OBJECT},
     ),
     destroy=extend_schema(
         summary="Delete a booking (Disabled)",
-        description="Deletions are not allowed. Use the /cancel/ action instead.",
+        description="Deletions are not allowed. Use the /cancel/ action instead",
         responses={405: OpenApiTypes.OBJECT},
     ),
     cancel=extend_schema(
         summary="Cancel a booking",
-        description="Allows a tenant to cancel their own booking.",
+        description="Allows a tenant to cancel their own booking",
         request=None,
         responses={200: BookingReadSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT},
     ),
     update_status=extend_schema(
         summary="Update booking status",
-        description="Allows an apartment owner to accept or reject a booking.",
+        description="Allows an apartment owner to accept or reject a booking",
         request=BookingStatusSerializer,
         responses={200: BookingReadSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT},
     ),
@@ -108,6 +110,8 @@ class BookingViewSet(viewsets.ViewSet):
     Uses BookingWriteSerializer for POST
     '''
     permission_classes = [IsAuthenticated, IsRenterOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = BookingFilter
     pagination_class = StandardResultsSetPagination
 
     def get_permissions(self) -> list[BasePermission]:
@@ -135,6 +139,8 @@ class BookingViewSet(viewsets.ViewSet):
 
     def list(self, request: DRFRequest) -> Response:
         queryset = self.get_queryset()
+        backend = DjangoFilterBackend()
+        queryset = backend.filter_queryset(request, queryset, self)
         
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request, view=self)
@@ -250,7 +256,7 @@ class BookingViewSet(viewsets.ViewSet):
                 ),
             )
 
-        # Trigger delayed email task if status is CONFIRMED
+        # trigger delayed email task if status is confirmed
         if new_status == Booking.Status.CONFIRMED:
             from .tasks import send_booking_confirmation_email
             transaction.on_commit(lambda: send_booking_confirmation_email.delay(booking.id))
