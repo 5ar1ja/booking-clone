@@ -8,12 +8,15 @@ from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response
 
 from django.db.models import QuerySet
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 
 from apps.core.pagination import StandardResultsSetPagination
+from apps.notifications.models import Notification
+from apps.notifications.utils import notify_after_commit
 from .models import Booking
 from .permissions import IsApartmentOwnerForBooking, IsBookingTenant, IsRenterOrReadOnly
 from .serializers import BookingReadSerializer, BookingWriteSerializer, BookingStatusSerializer
@@ -31,6 +34,26 @@ DETAIL_ALREADY_CANCELLED = 'Booking is already cancelled.'
 
 ACTION_CANCEL = 'cancel'
 ACTION_UPDATE_STATUS = 'update_status'
+
+
+def build_booking_notification_metadata(
+    booking: Booking,
+    *,
+    actor_email: str,
+    previous_status: str | None = None,
+) -> dict[str, Any]:
+    return {
+        'booking_id': booking.id,
+        'apartment_id': booking.apartment_id,
+        'apartment_title': booking.apartment.title,
+        'tenant_email': booking.tenant.email,
+        'landlord_email': booking.apartment.owner.email,
+        'status': booking.status,
+        'previous_status': previous_status,
+        'check_in': booking.check_in.isoformat(),
+        'check_out': booking.check_out.isoformat(),
+        'actor_email': actor_email,
+    }
 
 
 @extend_schema_view(
@@ -125,12 +148,28 @@ class BookingViewSet(viewsets.ViewSet):
     def create(self, request: DRFRequest) -> Response:
         serializer = BookingWriteSerializer(data=request.data)
         if serializer.is_valid():
-            booking = serializer.save(tenant=request.user)
-            logger.info(
-                'Booking created: tenant=%s, apartment_id=%s',
-                request.user.email,
-                booking.apartment_id,
-            )
+            with transaction.atomic():
+                booking = serializer.save(tenant=request.user)
+                logger.info(
+                    'Booking created: tenant=%s, apartment_id=%s',
+                    request.user.email,
+                    booking.apartment_id,
+                )
+
+                notify_after_commit(
+                    user=booking.apartment.owner,
+                    event_type=Notification.EventType.BOOKING_CREATED,
+                    message=(
+                        f'New booking request from {request.user.email} '
+                        f'for "{booking.apartment.title}".'
+                    ),
+                    booking=booking,
+                    metadata=build_booking_notification_metadata(
+                        booking,
+                        actor_email=request.user.email,
+                    ),
+                )
+
             read_serializer = BookingReadSerializer(booking)
             return Response(read_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -167,9 +206,24 @@ class BookingViewSet(viewsets.ViewSet):
                 {'detail': DETAIL_ALREADY_CANCELLED},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        booking.status = Booking.Status.CANCELLED
-        booking.save(update_fields=['status'])
-        logger.info('Booking %s cancelled by %s', booking.id, request.user.email)
+        previous_status = booking.status
+        with transaction.atomic():
+            booking.status = Booking.Status.CANCELLED
+            booking.save(update_fields=['status'])
+            logger.info('Booking %s cancelled by %s', booking.id, request.user.email)
+
+            notify_after_commit(
+                user=booking.apartment.owner,
+                event_type=Notification.EventType.BOOKING_CANCELLED,
+                message=f'Booking for "{booking.apartment.title}" has been cancelled by the tenant.',
+                booking=booking,
+                metadata=build_booking_notification_metadata(
+                    booking,
+                    actor_email=request.user.email,
+                    previous_status=previous_status,
+                ),
+            )
+
         return Response(BookingReadSerializer(booking).data)
 
     @action(methods=['patch'], detail=True, url_path='update-status')
@@ -178,13 +232,26 @@ class BookingViewSet(viewsets.ViewSet):
         booking = self.get_object(pk)
         serializer = BookingStatusSerializer(booking, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        
+
+        previous_status = booking.status
         new_status = serializer.validated_data.get('status')
-        serializer.save()
-        
+        with transaction.atomic():
+            serializer.save()
+
+            notify_after_commit(
+                user=booking.tenant,
+                event_type=Notification.EventType.BOOKING_STATUS_CHANGED,
+                message=f'Your booking for "{booking.apartment.title}" is now {new_status.upper()}.',
+                booking=booking,
+                metadata=build_booking_notification_metadata(
+                    booking,
+                    actor_email=request.user.email,
+                    previous_status=previous_status,
+                ),
+            )
+
         # Trigger delayed email task if status is CONFIRMED
         if new_status == Booking.Status.CONFIRMED:
-            from django.db import transaction
             from .tasks import send_booking_confirmation_email
             transaction.on_commit(lambda: send_booking_confirmation_email.delay(booking.id))
             logger.info('Booking #%s confirmed, email task queued.', booking.id)

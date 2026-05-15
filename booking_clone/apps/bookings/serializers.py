@@ -53,6 +53,17 @@ class BookingWriteSerializer(serializers.ModelSerializer):
 class BookingStatusSerializer(serializers.ModelSerializer):
     '''Used by the apartment owner to accept or reject a booking.'''
 
+    def validate_status(self, value: str) -> str:
+        allowed_statuses = {
+            Booking.Status.CONFIRMED,
+            Booking.Status.CANCELLED,
+        }
+        if value not in allowed_statuses:
+            raise serializers.ValidationError(
+                'status must be either confirmed or cancelled'
+            )
+        return value
+
     class Meta:
         model = Booking
         fields = ['status']

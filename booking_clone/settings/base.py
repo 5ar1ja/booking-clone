@@ -35,6 +35,7 @@ PROJECT_APPS = [
     'apps.properties',
     'apps.reviews',
     'apps.bookings',
+    'apps.notifications',
 ]
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
