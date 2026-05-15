@@ -10,6 +10,8 @@ from django.utils.log import RequireDebugTrue
 SETTINGS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SETTINGS_DIR)
 
+os.makedirs(os.path.join(PROJECT_ROOT, 'logs'), exist_ok=True)
+
 
 SECRET_KEY = config("BOOKING_SECRET_KEY", default="default-secret-key", cast=str)
 ENV_ID = config("BOOKING_ENV_ID", default="dev", cast=str)
@@ -158,12 +160,22 @@ LOGGING = {
             'level': 'WARNING',
             'propagate': False,
         },
-        'users': {
+        'apps.users': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
         },
-        'booking': {
+        'apps.bookings': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'apps.properties': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'apps.reviews': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
