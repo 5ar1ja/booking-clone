@@ -1,12 +1,16 @@
+# Python modules
 from typing import Any
 
+# Django modules
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+# Project modules
 from apps.properties.models import Apartment
+
 
 ERR_CHECKOUT_BEFORE_CHECKIN = _('check_out must be after check_in')
 ERR_DATES_OVERLAP = _('This apartment is already booked for the selected dates')

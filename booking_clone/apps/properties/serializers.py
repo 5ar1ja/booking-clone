@@ -1,7 +1,10 @@
+# Python modules
 from typing import Any
 
+# Third-party modules
 from rest_framework import serializers
 
+# Project modules
 from .models import Apartment, City, Country
 
 

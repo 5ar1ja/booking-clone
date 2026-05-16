@@ -1,29 +1,33 @@
+# Python modules
 import logging
 from typing import Any
 
-from django_filters.rest_framework import DjangoFilterBackend
+# Django modules
 from django.db.models import QuerySet
+from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+
+# Third-party modules
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission
 from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response
 
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.shortcuts import get_object_or_404
-
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
-from drf_spectacular.types import OpenApiTypes
-
-from apps.core.pagination import StandardResultsSetPagination
+# Project modules
 from apps.bookings.models import Booking
+from apps.core.pagination import StandardResultsSetPagination
 from apps.reviews.models import Review
 from apps.reviews.serializers import ReviewReadSerializer
 from .filters import ApartmentFilter
 from .models import Apartment
 from .permissions import IsApartmentOwner, IsLandlordOrReadOnly
 from .serializers import ApartmentReadSerializer, ApartmentWriteSerializer
+
 
 logger = logging.getLogger('apps.properties')
 

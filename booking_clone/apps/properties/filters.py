@@ -1,7 +1,13 @@
+# Python modules
 from typing import Any
 
+# Django modules
+from django.db.models import QuerySet
+
+# Third-party modules
 import django_filters
-from django.db.models import Q, QuerySet
+
+# Project modules
 from apps.bookings.models import Booking
 from .models import Apartment
 

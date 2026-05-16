@@ -1,7 +1,10 @@
+# Third-party modules
 import pytest
 from rest_framework.test import APIClient
-from apps.users.models import CustomUser
+
+# Project modules
 from apps.properties.models import Country, City, Apartment
+from apps.users.models import CustomUser
 
 
 @pytest.fixture

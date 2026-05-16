@@ -1,21 +1,25 @@
+# Python modules
 import asyncio
 import logging
 from typing import AsyncGenerator
 
-from asgiref.sync import sync_to_async
+# Django modules
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
-from rest_framework import mixins, status, viewsets
-from django.http import HttpResponse, StreamingHttpResponse
+
+# Third-party modules
+from asgiref.sync import sync_to_async
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+# Project modules
 from .models import Notification
 from .serializers import NotificationSerializer
 from .utils import format_sse_event, get_user_from_jwt
+
 
 logger = logging.getLogger('apps.notifications')
 

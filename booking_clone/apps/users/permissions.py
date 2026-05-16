@@ -1,5 +1,7 @@
+# Python modules
 from typing import Any
 
+# Third-party modules
 from rest_framework import permissions
 from rest_framework.request import Request
 

@@ -1,6 +1,10 @@
+# Third-party modules
 import pytest
 from rest_framework.test import APIClient
+
+# Project modules
 from apps.users.models import CustomUser
+
 
 @pytest.fixture
 def api_client() -> APIClient:

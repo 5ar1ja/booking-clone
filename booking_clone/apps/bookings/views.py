@@ -1,25 +1,29 @@
+# Python modules
 import logging
 from typing import Any
 
+# Django modules
+from django.db import transaction
+from django.db.models import QuerySet
+from django.shortcuts import get_object_or_404
+
+# Third-party modules
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response
 
-from django.db.models import QuerySet
-from django.db import transaction
-from django.shortcuts import get_object_or_404
-
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample
-from drf_spectacular.types import OpenApiTypes
-
+# Project modules
 from apps.core.pagination import StandardResultsSetPagination
 from apps.notifications.models import Notification
 from apps.notifications.utils import notify_after_commit
 from .models import Booking
 from .permissions import IsApartmentOwnerForBooking, IsBookingTenant, IsRenterOrReadOnly
 from .serializers import BookingReadSerializer, BookingWriteSerializer, BookingStatusSerializer
+
 
 logger = logging.getLogger('apps.bookings')
 

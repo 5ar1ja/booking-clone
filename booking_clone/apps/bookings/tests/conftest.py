@@ -1,11 +1,14 @@
-from datetime import date, timedelta
+# Python modules
 from typing import Callable
 
+# Third-party modules
 import pytest
 from rest_framework.test import APIClient
-from apps.users.models import CustomUser
-from apps.properties.models import Country, City, Apartment
+
+# Project modules
 from apps.bookings.models import Booking
+from apps.properties.models import Country, City, Apartment
+from apps.users.models import CustomUser
 
 
 @pytest.fixture

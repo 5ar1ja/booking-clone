@@ -1,21 +1,23 @@
+# Python modules
 from datetime import date, timedelta
 
+# Third-party modules
 import pytest
+
+# Project modules
 from apps.bookings.models import Booking
 from apps.properties.models import Apartment
+from apps.properties.tests.conftest import (
+    api_client,
+    landlord,
+    another_landlord,
+    renter,
+    country,
+    city,
+    apartment,
+)
 from apps.reviews.models import Review
 from apps.users.models import CustomUser
-
-# Import fixtures from properties tests
-from apps.properties.tests.conftest import (
-    api_client, 
-    landlord, 
-    another_landlord, 
-    renter, 
-    country, 
-    city, 
-    apartment
-)
 
 
 @pytest.fixture

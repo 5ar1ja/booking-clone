@@ -1,9 +1,11 @@
+# Python modules
 from __future__ import annotations
-
 from typing import Any
 
+# Django modules
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+
 
 ERR_EMAIL_REQUIRED = 'Users must have an email address'
 ERR_STAFF_REQUIRED = 'Superuser must have is_staff=True'

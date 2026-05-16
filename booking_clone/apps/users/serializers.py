@@ -1,11 +1,16 @@
+# Python modules
 from typing import Any
 
+# Django modules
+from django.contrib.auth import authenticate
+
+# Third-party modules
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
-from django.contrib.auth import authenticate
-
+# Project modules
 from apps.users.models import CustomUser
+
 
 ERR_ROLE_CONFLICT = 'You must choose exactly one role: Landlord or Renter.'
 ERR_INVALID_CREDENTIALS = 'Invalid email or password.'

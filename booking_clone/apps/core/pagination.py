@@ -1,3 +1,4 @@
+# Third-party modules
 from rest_framework.pagination import PageNumberPagination
 
 class StandardResultsSetPagination(PageNumberPagination):

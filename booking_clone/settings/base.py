@@ -1,6 +1,8 @@
 # Python modules
 import os
 
+# Django modules
+
 # Third-party modules
 from celery.schedules import crontab
 

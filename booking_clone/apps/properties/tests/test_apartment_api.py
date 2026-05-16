@@ -1,4 +1,7 @@
+# Third-party modules
 from rest_framework import status
+
+# Project modules
 from apps.properties.models import Apartment
 from .base import BaseApartmentTest
 

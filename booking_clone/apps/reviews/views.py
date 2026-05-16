@@ -1,26 +1,28 @@
+# Python modules
 import logging
 from typing import Any
 
+# Django modules
 from django.db.models import QuerySet
-from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 
+# Third-party modules
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets, status
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.serializers import BaseSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response
 
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
-from drf_spectacular.types import OpenApiTypes
-
-from apps.core.pagination import StandardResultsSetPagination
+# Project modules
 from apps.bookings.models import Booking
+from apps.core.pagination import StandardResultsSetPagination
 from .filters import ReviewFilter
 from .models import Review
 from .permissions import IsReviewAuthorOrReadOnly
 from .serializers import ReviewReadSerializer, ReviewWriteSerializer
+
 
 logger = logging.getLogger('apps.reviews')
 

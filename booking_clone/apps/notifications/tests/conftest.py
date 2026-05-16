@@ -1,9 +1,12 @@
+# Python modules
 from datetime import date, timedelta
 from typing import Callable
 
+# Third-party modules
 import pytest
 from rest_framework.test import APIClient
 
+# Project modules
 from apps.bookings.models import Booking
 from apps.properties.models import Apartment, City, Country
 from apps.users.models import CustomUser

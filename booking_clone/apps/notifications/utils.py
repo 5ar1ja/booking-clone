@@ -1,13 +1,18 @@
+# Python modules
 from __future__ import annotations
-
 import json
 from typing import TYPE_CHECKING, Any
 
+# Django modules
 from django.db import transaction
+
+# Third-party modules
 from rest_framework_simplejwt.tokens import AccessToken
 
+# Project modules
 from apps.users.models import CustomUser
 from .models import Notification
+
 
 if TYPE_CHECKING:
     from apps.bookings.models import Booking

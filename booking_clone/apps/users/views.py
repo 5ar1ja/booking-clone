@@ -1,6 +1,9 @@
+# Python modules
 import logging
 from typing import Any
 
+# Third-party modules
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request as DRFRequest
@@ -9,9 +12,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 from rest_framework.viewsets import ViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from drf_spectacular.utils import extend_schema, extend_schema_view
-from drf_spectacular.types import OpenApiTypes
-
+# Project modules
 from apps.users.serializers import (
     UserReadSerializer,
     UserLoginSerializer,
@@ -19,6 +20,7 @@ from apps.users.serializers import (
     UserUpdateSerializer,
     LoginResponseSerializer,
 )
+
 
 logger = logging.getLogger('apps.users')
 

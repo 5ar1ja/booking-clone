@@ -1,12 +1,18 @@
+# Python modules
 from datetime import date, timedelta
 
-import pytest
+# Django modules
 from django.urls import reverse
+
+# Third-party modules
+import pytest
 from rest_framework import status
 
+# Project modules
 from apps.notifications.models import Notification
 from apps.notifications.utils import format_sse_event
 from apps.notifications.views import _get_notifications_for_user
+
 
 NOTIFICATION_LIST_URL = reverse('notification-list')
 
