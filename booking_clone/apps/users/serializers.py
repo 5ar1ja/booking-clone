@@ -2,13 +2,14 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
 
 from apps.users.models import CustomUser
 
-ERR_ROLE_CONFLICT = 'You must choose exactly one role: Landlord or Renter.'
-ERR_INVALID_CREDENTIALS = 'Invalid email or password.'
-ERR_ACCOUNT_DISABLED = 'User account is disabled.'
-ERR_MISSING_CREDENTIALS = 'Must include \'email\' and \'password\'.'
+ERR_ROLE_CONFLICT = _('You must choose exactly one role: Landlord or Renter.')
+ERR_INVALID_CREDENTIALS = _('Invalid email or password.')
+ERR_ACCOUNT_DISABLED = _('User account is disabled.')
+ERR_MISSING_CREDENTIALS = _('Must include \'email\' and \'password\'.')
 
 
 class UserReadSerializer(serializers.ModelSerializer):
