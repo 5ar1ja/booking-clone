@@ -2,11 +2,12 @@ import logging
 from typing import Any
 
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import QuerySet
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission
 from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
@@ -117,15 +118,15 @@ class ApartmentViewSet(viewsets.ViewSet):
     filterset_class = ApartmentFilter
     pagination_class = StandardResultsSetPagination
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Apartment]:
         return Apartment.objects.select_related('city', 'city__country', 'owner').all()
 
-    def get_object(self, pk):
+    def get_object(self, pk: Any = None) -> Apartment:
         obj = get_object_or_404(self.get_queryset(), pk=pk)
         self.check_object_permissions(self.request, obj)
         return obj
 
-    def get_permissions(self):
+    def get_permissions(self) -> list[BasePermission]:
         if self.action in ['update', 'partial_update', 'destroy']:
             return [IsAuthenticatedOrReadOnly(), IsLandlordOrReadOnly(), IsApartmentOwner()]
         return super().get_permissions()

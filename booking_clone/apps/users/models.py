@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
@@ -15,7 +17,7 @@ class CustomUserManager(BaseUserManager):
     '''Manager for CustomUser using email as the unique identifier.'''
 
     def create_user(
-        self, email: str, password: str | None = None, **extra_fields
+        self, email: str, password: str | None = None, **extra_fields: Any
     ) -> CustomUser:
         if not email:
             raise ValueError(ERR_EMAIL_REQUIRED)
@@ -26,7 +28,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(
-        self, email: str, password: str, **extra_fields
+        self, email: str, password: str, **extra_fields: Any
     ) -> CustomUser:
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)

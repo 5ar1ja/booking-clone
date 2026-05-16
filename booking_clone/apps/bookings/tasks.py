@@ -20,7 +20,7 @@ STALE_BOOKING_THRESHOLD_HOURS = 24
     retry_backoff=True,
     max_retries=3,
 )
-def send_booking_confirmation_email(booking_id: int):
+def send_booking_confirmation_email(booking_id: int) -> None:
     '''
     Sends a confirmation email to the tenant when a booking is confirmed.
     
@@ -56,7 +56,7 @@ def send_booking_confirmation_email(booking_id: int):
     retry_backoff=True,
     max_retries=2,
 )
-def cleanup_stale_bookings():
+def cleanup_stale_bookings() -> int:
     '''
     Periodical task to cancel PENDING bookings older than threshold.
     

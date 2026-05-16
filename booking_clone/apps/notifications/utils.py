@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.db import transaction
 from rest_framework_simplejwt.tokens import AccessToken
@@ -7,13 +9,16 @@ from rest_framework_simplejwt.tokens import AccessToken
 from apps.users.models import CustomUser
 from .models import Notification
 
+if TYPE_CHECKING:
+    from apps.bookings.models import Booking
+
 
 def create_notification(
     *,
     user: CustomUser,
     event_type: str,
     message: str,
-    booking=None,
+    booking: Booking | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> Notification:
     '''Creates a durable notification row after the surrounding transaction commits.'''
@@ -32,7 +37,7 @@ def notify_after_commit(
     user: CustomUser,
     event_type: str,
     message: str,
-    booking=None,
+    booking: Booking | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> None:
     '''Defers notification creation until the current transaction commits successfully.'''
@@ -73,7 +78,7 @@ def format_sse_event(notification: Notification) -> str:
     )
 
 
-def get_user_from_jwt(token: str):
+def get_user_from_jwt(token: str) -> CustomUser | None:
     '''
     Helper to authenticate user from JWT token manually.
     Useful for async views where standard middleware might be tricky.

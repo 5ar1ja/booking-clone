@@ -29,7 +29,7 @@ class ReviewWriteSerializer(serializers.ModelSerializer):
             'comment',
         ]
 
-    def validate_rating(self, value):
+    def validate_rating(self, value: int) -> int:
         if not (1 <= value <= 5):
             raise serializers.ValidationError("Rating must be between 1 and 5.")
         return value

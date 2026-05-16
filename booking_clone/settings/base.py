@@ -1,6 +1,9 @@
 # Python modules
 import os
 
+# Third-party modules
+from celery.schedules import crontab
+
 # Project modules
 from settings.conf import *  # noqa
 
@@ -50,7 +53,6 @@ CELERY_TIMEZONE = 'UTC'
 
 # Celery Beat Configuration
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'cleanup-stale-bookings-every-hour': {
         'task': 'apps.bookings.tasks.cleanup_stale_bookings',

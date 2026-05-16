@@ -1,6 +1,7 @@
 import logging
 from typing import Any
 
+from django.db.models import QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 
@@ -73,10 +74,10 @@ class ReviewViewSet(viewsets.ViewSet):
     filterset_class = ReviewFilter
     pagination_class = StandardResultsSetPagination
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Review]:
         return Review.objects.select_related('author', 'apartment').all()
 
-    def get_object(self, pk):
+    def get_object(self, pk: Any = None) -> Review:
         obj = get_object_or_404(self.get_queryset(), pk=pk)
         self.check_object_permissions(self.request, obj)
         return obj

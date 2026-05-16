@@ -3,12 +3,12 @@ from rest_framework.test import APIClient
 from apps.users.models import CustomUser
 
 @pytest.fixture
-def api_client():
+def api_client() -> APIClient:
     '''API client fixture for testing endpoints.'''
     return APIClient()
 
 @pytest.fixture
-def user_data():
+def user_data() -> dict:
     '''Valid user registration data.'''
     return {
         'email': 'newuser@test.com',
@@ -20,7 +20,7 @@ def user_data():
     }
 
 @pytest.fixture
-def test_user(db):
+def test_user(db) -> CustomUser:
     '''A saved user instance for testing login and profile.'''
     return CustomUser.objects.create_user(
         email='testuser@test.com',

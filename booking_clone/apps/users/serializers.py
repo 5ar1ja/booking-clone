@@ -1,3 +1,5 @@
+from typing import Any
+
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
@@ -32,12 +34,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ('email', 'password', 'first_name', 'last_name', 'is_landlord', 'is_renter')
 
-    def validate(self, data: dict) -> dict:
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         if data.get('is_landlord') == data.get('is_renter'):
             raise ValidationError(ERR_ROLE_CONFLICT)
         return data
 
-    def create(self, validated_data: dict) -> CustomUser:
+    def create(self, validated_data: dict[str, Any]) -> CustomUser:
         password = validated_data.pop('password')
         return CustomUser.objects.create_user(password=password, **validated_data)
 
@@ -55,7 +57,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['first_name', 'last_name', 'password']
 
-    def update(self, instance: CustomUser, validated_data: dict) -> CustomUser:
+    def update(self, instance: CustomUser, validated_data: dict[str, Any]) -> CustomUser:
         password = validated_data.pop('password', None)
         instance = super().update(instance, validated_data)
         if password:
@@ -70,7 +72,7 @@ class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
-    def validate(self, data: dict) -> dict:
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         email = data.get('email')
         password = data.get('password')
 

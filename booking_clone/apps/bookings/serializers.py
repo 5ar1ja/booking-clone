@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Any
 
 from rest_framework import serializers
 
@@ -37,7 +38,7 @@ class BookingWriteSerializer(serializers.ModelSerializer):
             'check_out',
         ]
 
-    def validate(self, data: dict) -> dict:
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         check_in = data.get('check_in')
         check_out = data.get('check_out')
 
