@@ -10,15 +10,18 @@ from celery.schedules import crontab
 # Project modules
 from settings.conf import *  # noqa
 
-
+# ----------------------------------------------
+# Path
+#
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_URLCONF = 'settings.urls'
 WSGI_APPLICATION = 'settings.wsgi.application'
 ASGI_APPLICATION = 'settings.asgi.application'
 AUTH_USER_MODEL = 'users.CustomUser'
 
-# Application definition
-
+# ----------------------------------------------
+# Apps
+#
 DJANGO_AND_THIRD_PARTY_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,7 +49,9 @@ PROJECT_APPS = [
 
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
 
-# Celery Configuration Options
+# ----------------------------------------------
+# Celery
+#
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -54,7 +59,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
-# Celery Beat Configuration
+
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_BEAT_SCHEDULE = {
     'cleanup-stale-bookings-every-hour': {
@@ -67,7 +72,9 @@ CELERY_BEAT_SCHEDULE = {
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'support@booking-clone.com'
 
-
+# ----------------------------------------------
+# Middleware | Templates | Validators
+#
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -111,7 +118,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# ----------------------------------------------
+# Internationalization
+#
 LANGUAGE_EN = 'en'
 LANGUAGE_RU = 'ru'
 
@@ -128,7 +137,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
+# ----------------------------------------------
+# Static | Media
+#
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
