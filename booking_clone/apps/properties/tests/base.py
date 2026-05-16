@@ -1,5 +1,7 @@
+# Third-party modules
 from rest_framework.test import APIClient, APITestCase
 
+# Project modules
 from apps.properties.models import Apartment, City, Country
 from apps.users.models import CustomUser
 

@@ -1,9 +1,13 @@
+# Django modules
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+# Project modules
+from apps.core.mixins.models import TimestampedModel
 
-class Notification(models.Model):
+
+class Notification(TimestampedModel):
     '''Stores durable user notifications for API access and SSE replay.'''
 
     class EventType(models.TextChoices):

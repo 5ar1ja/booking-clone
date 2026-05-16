@@ -1,7 +1,14 @@
+# Python modules
 from typing import Any
 
+# Third-party modules
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 from rest_framework.request import Request
+
+# Project modules
+from apps.core.permissions import IsLandlord
+from apps.core.permissions import IsOwnerOrReadOnly as IsApartmentOwner
 
 
 class IsLandlordOrReadOnly(BasePermission):
@@ -10,13 +17,4 @@ class IsLandlordOrReadOnly(BasePermission):
     def has_permission(self, request: Request, view: Any) -> bool:
         if request.method in SAFE_METHODS:
             return True
-        return bool(request.user and request.user.is_authenticated and request.user.is_landlord)
-
-
-class IsApartmentOwner(BasePermission):
-    '''Object-level write access only for the apartment owner.'''
-
-    def has_object_permission(self, request: Request, view: Any, obj: Any) -> bool:
-        if request.method in SAFE_METHODS:
-            return True
-        return bool(obj.owner == request.user)
+        return IsLandlord().has_permission(request, view)

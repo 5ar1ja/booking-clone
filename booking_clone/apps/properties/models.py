@@ -1,7 +1,11 @@
+# Django modules
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+# Project modules
+from apps.core.mixins.models import TimestampedModel
 
 
 class Country(models.Model):
@@ -51,7 +55,7 @@ class City(models.Model):
         return f"{self.name}, {self.country}"
 
 
-class Apartment(models.Model):
+class Apartment(TimestampedModel):
     """Represents a rental apartment listing owned by a landlord."""
 
     title = models.CharField(
@@ -95,12 +99,6 @@ class Apartment(models.Model):
         related_name="apartments",
         verbose_name=_("owner"),
         help_text=_("The user who owns this apartment listing."),
-    )
-    created_at = models.DateTimeField(
-        _("created at"),
-        auto_now_add=True,
-        db_index=True,
-        help_text=_("The date and time when the listing was created."),
     )
 
     class Meta:

@@ -1,10 +1,12 @@
 # Python modules
 import os
 from datetime import timedelta
-from decouple import Csv, config
 
 # Django modules
 from django.utils.log import RequireDebugTrue
+
+# Third-party modules
+from decouple import Csv, config
 
 
 SETTINGS_DIR = os.path.dirname(os.path.abspath(__file__))

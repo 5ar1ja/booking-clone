@@ -1,13 +1,19 @@
+# Python modules
 import logging
 from datetime import timedelta
 
-from celery import shared_task
+# Django modules
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import DatabaseError
 from django.utils import timezone
 
+# Third-party modules
+from celery import shared_task
+
+# Project modules
 from apps.bookings.models import Booking
+
 
 logger = logging.getLogger('apps.bookings')
 
@@ -20,7 +26,7 @@ STALE_BOOKING_THRESHOLD_HOURS = 24
     retry_backoff=True,
     max_retries=3,
 )
-def send_booking_confirmation_email(booking_id: int):
+def send_booking_confirmation_email(booking_id: int) -> None:
     '''
     Sends a confirmation email to the tenant when a booking is confirmed.
     
@@ -56,7 +62,7 @@ def send_booking_confirmation_email(booking_id: int):
     retry_backoff=True,
     max_retries=2,
 )
-def cleanup_stale_bookings():
+def cleanup_stale_bookings() -> int:
     '''
     Periodical task to cancel PENDING bookings older than threshold.
     

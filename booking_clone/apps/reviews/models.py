@@ -1,15 +1,19 @@
+# Django modules
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+# Project modules
+from apps.core.mixins.models import TimestampedModel
 from apps.properties.models import Apartment
+
 
 MIN_RATING = 1
 MAX_RATING = 5
 
 
-class Review(models.Model):
+class Review(TimestampedModel):
     """Stores a renter review for an apartment they have completed a stay in."""
 
     apartment = models.ForeignKey(
@@ -35,17 +39,6 @@ class Review(models.Model):
     comment = models.TextField(
         _("comment"),
         help_text=_("The textual feedback from the user."),
-    )
-    created_at = models.DateTimeField(
-        _("created at"),
-        auto_now_add=True,
-        db_index=True,
-        help_text=_("The date and time when the review was created."),
-    )
-    updated_at = models.DateTimeField(
-        _("updated at"),
-        auto_now=True,
-        help_text=_("The date and time when the review was last updated."),
     )
 
     class Meta:

@@ -1,8 +1,14 @@
+# Python modules
 from datetime import date
+from typing import Any
 
+# Django modules
 from django.utils.translation import gettext_lazy as _
+
+# Third-party modules
 from rest_framework import serializers
 
+# Project modules
 from .models import Booking
 
 ERR_CHECKIN_PAST = _('check_in cannot be in the past')
@@ -39,7 +45,7 @@ class BookingWriteSerializer(serializers.ModelSerializer):
             'check_out',
         ]
 
-    def validate(self, data: dict) -> dict:
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         check_in = data.get('check_in')
         check_out = data.get('check_out')
 

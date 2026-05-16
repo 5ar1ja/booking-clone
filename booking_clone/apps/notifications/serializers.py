@@ -1,5 +1,7 @@
+# Third-party modules
 from rest_framework import serializers
 
+# Project modules
 from .models import Notification
 
 

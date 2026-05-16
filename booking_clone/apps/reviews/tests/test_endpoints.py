@@ -1,7 +1,13 @@
-import pytest
+# Django modules
 from django.urls import reverse
+
+# Third-party modules
+import pytest
 from rest_framework import status
+
+# Project modules
 from apps.reviews.models import Review
+
 
 @pytest.mark.django_db
 class TestReviewAPI:

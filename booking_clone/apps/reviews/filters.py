@@ -1,4 +1,7 @@
+# Third-party modules
 import django_filters
+
+# Project modules
 from .models import Review
 
 

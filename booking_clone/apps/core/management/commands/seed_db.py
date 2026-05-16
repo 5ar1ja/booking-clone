@@ -1,21 +1,28 @@
+# Python modules
+import argparse
 import random
 from datetime import date, timedelta
+from typing import Any
+
+# Django modules
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from apps.users.models import CustomUser
-from apps.properties.models import Country, City, Apartment
+# Project modules
 from apps.bookings.models import Booking
+from apps.properties.models import Country, City, Apartment
 from apps.reviews.models import Review
+from apps.users.models import CustomUser
+
 
 class Command(BaseCommand):
     help = 'Seeds the database with sample data'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument('--clear', action='store_true', help='Clear existing data before seeding')
 
     @transaction.atomic
-    def handle(self, *args, **options):
+    def handle(self, *args: Any, **options: Any) -> None:
         if options['clear']:
             self.stdout.write('Clearing existing data...')
             Review.objects.all().delete()
@@ -27,7 +34,7 @@ class Command(BaseCommand):
 
         self.stdout.write('Seeding data...')
 
-        # 1. Create Users
+        # Create Users
         landlords = []
         for i in range(5):
             email = f'landlord{i}@example.com'
@@ -52,7 +59,7 @@ class Command(BaseCommand):
                 user.save()
             renters.append(user)
 
-        # 2. Create Countries and Cities
+        # Create Countries and Cities
         countries_data = {
             'Kazakhstan': ['Almaty', 'Astana', 'Shymkent'],
             'France': ['Paris', 'Lyon', 'Marseille'],
@@ -66,7 +73,7 @@ class Command(BaseCommand):
                 city, _ = City.objects.get_or_create(name=city_name, country=country)
                 cities.append(city)
 
-        # 3. Create Apartments
+        # Create Apartments
         apartments = []
         titles = ['Cozy Studio', 'Luxury Penthouse', 'Modern Loft', 'Quiet Garden Apartment', 'Central Suite']
         for i in range(20):
@@ -84,7 +91,7 @@ class Command(BaseCommand):
             )
             apartments.append(apt)
 
-        # 4. Create Bookings and Reviews
+        # Create Bookings and Reviews
         for renter in renters:
             # Each renter makes 2-4 bookings
             num_bookings = random.randint(2, 4)

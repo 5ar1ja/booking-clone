@@ -1,8 +1,8 @@
-# Python modeles
+# Python modules
 import os
 import sys
 
-# Project modeles
+# Project modules
 from settings.conf import ALLOWED_ENV_IDS, ENV_ID
 
 

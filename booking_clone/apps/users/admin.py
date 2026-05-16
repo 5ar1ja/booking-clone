@@ -1,7 +1,9 @@
+# Django modules
 from django.contrib.admin import register
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
+# Project modules
 from apps.users.models import CustomUser
 
 
