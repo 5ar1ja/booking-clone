@@ -3,15 +3,18 @@ import logging
 from typing import Any
 
 # Django modules
+from django.core.cache import cache
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
+from django.utils.dateparse import parse_date
 from django.views.decorators.cache import cache_page
 
 # Third-party modules
+from django_redis.exceptions import ConnectionInterrupted
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
+from redis.exceptions import ConnectionError as RedisConnectionError
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission
@@ -19,7 +22,6 @@ from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response
 
 # Project modules
-from apps.core.pagination import StandardResultsSetPagination
 from apps.core.mixins.views import ActionSerializerMixin
 from apps.bookings.models import Booking
 from apps.core.pagination import StandardResultsSetPagination
@@ -135,6 +137,7 @@ class ApartmentViewSet(ActionSerializerMixin, viewsets.ModelViewSet):
         return Apartment.objects.select_related('city', 'city__country', 'owner').all()
 
     def get_object(self, pk: Any = None) -> Apartment:
+        pk = pk if pk is not None else self.kwargs.get('pk')
         obj = get_object_or_404(self.get_queryset(), pk=pk)
         self.check_object_permissions(self.request, obj)
         return obj
@@ -148,21 +151,38 @@ class ApartmentViewSet(ActionSerializerMixin, viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
         logger.info('Apartment created: owner=%s', self.request.user.email)
 
-    @method_decorator(cache_page(60, key_prefix='apartment_review'))
     @action(detail=True, methods=['get'])
     def reviews(self, request: DRFRequest, pk: Any = None) -> Response:
-        '''Returns all reviews for the given apartment (cached 60 s).'''
+        '''Returns all reviews for the given apartment with best-effort caching.'''
         apartment = self.get_object()
-        reviews = Review.objects.filter(apartment=apartment).select_related('author')
-        
+
         paginator = self.pagination_class()
+        cache_key = f'apartment_review:{apartment.pk}:page:{request.query_params.get("page", "1")}'
+
+        try:
+            cached_payload = cache.get(cache_key)
+        except (ConnectionInterrupted, RedisConnectionError):
+            cached_payload = None
+
+        if cached_payload is not None:
+            return Response(cached_payload)
+
+        reviews = Review.objects.filter(apartment=apartment).select_related('author')
         page = paginator.paginate_queryset(reviews, request, view=self)
         if page is not None:
             serializer = ReviewReadSerializer(page, many=True)
-            return paginator.get_paginated_response(serializer.data)
+            response = paginator.get_paginated_response(serializer.data)
+            payload = response.data
+        else:
+            serializer = ReviewReadSerializer(reviews, many=True)
+            payload = serializer.data
 
-        serializer = ReviewReadSerializer(reviews, many=True)
-        return Response(serializer.data)
+        try:
+            cache.set(cache_key, payload, timeout=60)
+        except (ConnectionInterrupted, RedisConnectionError):
+            pass
+
+        return Response(payload)
 
     @action(detail=True, methods=['get'])
     def availability(self, request: DRFRequest, pk: Any = None) -> Response:
@@ -174,10 +194,17 @@ class ApartmentViewSet(ActionSerializerMixin, viewsets.ModelViewSet):
             apartment=apartment,
             status__in=[Booking.Status.PENDING, Booking.Status.CONFIRMED]
         ).values('check_in', 'check_out').order_by('check_in')
-        
+
+        busy_dates = [
+            {
+                'check_in': parse_date(item['check_in'].isoformat()) or item['check_in'],
+                'check_out': parse_date(item['check_out'].isoformat()) or item['check_out'],
+            }
+            for item in busy_bookings
+        ]
         serializer = ApartmentReadSerializer(apartment)
-        
+
         return Response({
             'apartment': serializer.data,
-            'busy_dates': list(busy_bookings)
+            'busy_dates': busy_dates
         })

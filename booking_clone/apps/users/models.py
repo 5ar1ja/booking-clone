@@ -8,13 +8,11 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from apps.users.constants import ERR_ROLE_CONFLICT, ROLE_LANDLORD, ROLE_RENTER
+
 ERR_EMAIL_REQUIRED = _('Users must have an email address')
 ERR_STAFF_REQUIRED = _('Superuser must have is_staff=True')
 ERR_SUPERUSER_REQUIRED = _('Superuser must have is_superuser=True')
-ERR_ROLE_CONFLICT = _('You must choose exactly one role: Landlord or Renter.')
-
-ROLE_LANDLORD = _('Landlord')
-ROLE_RENTER = _('Renter')
 
 
 class CustomUserManager(BaseUserManager):
@@ -128,5 +126,5 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             raise ValidationError(ERR_ROLE_CONFLICT)
 
     def save(self, *args: Any, **kwargs: Any) -> None:
-        self.full_clean()
+        self.clean()
         super().save(*args, **kwargs)
