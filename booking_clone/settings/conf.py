@@ -15,6 +15,8 @@ from decouple import Csv, config
 SETTINGS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SETTINGS_DIR)
 
+os.makedirs(os.path.join(PROJECT_ROOT, 'logs'), exist_ok=True)
+
 
 # ----------------------------------------------
 # Core env vars
@@ -42,7 +44,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'EXCEPTION_HANDLER': 'apps.core.exceptions.custom_exception_handler',
 }
 
 # ----------------------------------------------
@@ -176,12 +177,22 @@ LOGGING = {
             'level': 'WARNING',
             'propagate': False,
         },
-        'users': {
+        'apps.users': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
         },
-        'booking': {
+        'apps.bookings': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'apps.properties': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'apps.reviews': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
@@ -204,6 +215,12 @@ REDIS_DB = config("REDIS_DB", cast=int, default=2)
 
 REDIS_CELERY_URL = config("BOOKING_CELERY_BROKER_URL", default=f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}")
 REDIS_URL = config("BOOKING_REDIS_URL", default=f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}")
+
+# ------------------------------------------------
+# Celery
+#
+CELERY_BROKER_URL = REDIS_CELERY_URL
+CELERY_RESULT_BACKEND = REDIS_CELERY_URL
 
 # ------------------------------------------------
 # Caching

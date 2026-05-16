@@ -17,6 +17,8 @@ ERR_INVALID_STATUS = _('status must be either confirmed or cancelled')
 
 
 class BookingReadSerializer(serializers.ModelSerializer):
+    '''Serializer for reading booking data; includes nested apartment and renter info.'''
+
     tenant = serializers.ReadOnlyField(source='tenant.email')
     apartment_title = serializers.ReadOnlyField(source='apartment.title')
 
@@ -37,6 +39,8 @@ class BookingReadSerializer(serializers.ModelSerializer):
 
 
 class BookingWriteSerializer(serializers.ModelSerializer):
+    '''Serializer for creating a booking; validates that check-out is after check-in'''
+
     class Meta:
         model = Booking
         fields = [
@@ -46,6 +50,8 @@ class BookingWriteSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        '''Reject overlapping bookings for the same apartment.'''
+        
         check_in = data.get('check_in')
         check_out = data.get('check_out')
 

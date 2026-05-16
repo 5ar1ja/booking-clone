@@ -6,7 +6,7 @@ from .models import Notification
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    booking_id = serializers.IntegerField(source='booking.id', read_only=True)
+    booking_id = serializers.IntegerField(source='booking.id', read_only=True, allow_null=True)
 
     class Meta:
         model = Notification
