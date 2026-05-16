@@ -1,8 +1,8 @@
-# Booking Clone — Team Backend Project (Django + DRF + PostgreSQL)
+# Booking Clone — Team Backend Project (Django + DRF + Docker)
 
 This repository contains our team backend project: a simplified booking service API.
 The project is built for university practice and is organized as incremental modules
-(properties, users/auth, bookings, reviews, logging).
+(properties, users/auth, bookings, reviews, notifications, logging, localization).
 
 ---
 
@@ -12,7 +12,7 @@ The goal of this project is to learn how to design a real backend service in sta
 
 - model domain entities in Django ORM
 - expose REST API with Django REST Framework
-- work with PostgreSQL as the main DB
+- work with a production-like backend stack and supporting services
 - use team workflow with feature branches and pull requests
 
 Think of the project as a constructor:
@@ -67,7 +67,7 @@ CityViewSet (CRUD actions)
 CitySerializer (validation + JSON transform)
     |
     v
-City model (ORM) <-> PostgreSQL
+City model (ORM) <-> Database
 ```
 
 ### Layer responsibilities
@@ -81,12 +81,16 @@ City model (ORM) <-> PostgreSQL
 
 ## 4. Tech Stack
 
-- Python 3.14+
-- Django 6.0.2
-- Django REST Framework 3.16.1
-- PostgreSQL 14+
-- `python-dotenv`, `python-decouple`
-- `psycopg` (PostgreSQL driver)
+- Python 3.12
+- Django 5.1
+- Django REST Framework 3.16
+- SQLite
+- Redis
+- Celery + Celery Beat
+- Daphne (ASGI)
+- Nginx
+- Flower
+- Docker Compose
 
 ---
 
@@ -94,119 +98,226 @@ City model (ORM) <-> PostgreSQL
 
 ```text
 booking-clone/
+├── Dockerfile
+├── docker-compose.yml
 ├── booking_clone/
 │   ├── apps/
 │   │   ├── properties/
-│   │   │   ├── migrations/
-│   │   │   ├── models.py
-│   │   │   ├── serializers.py
-│   │   │   ├── views.py
-│   │   │   └── urls.py
 │   │   ├── users/
 │   │   ├── bookings/
-│   │   └── reviews/
+│   │   ├── reviews/
+│   │   └── notifications/
+│   ├── locale/
 │   ├── settings/
 │   │   ├── base.py
 │   │   ├── conf.py
+│   │   ├── env/
 │   │   └── urls.py
+│   ├── templates/
+│   ├── .env
+│   ├── .env.example
 │   ├── manage.py
-│   ├── requirements.txt
-│   └── .example.env
+│   └── pytest.ini
+├── nginx/
+├── requirements/
+├── scripts/
 └── README.md
 ```
 
 ---
 
-## 6. Environment Setup (Step-by-Step)
+## 6. Run With Docker Compose
 
 ### 6.1 Clone and enter project
 
 ```bash
 git clone https://github.com/5ar1ja/booking-clone.git
-cd booking-clone/booking_clone
+cd booking-clone
 ```
 
-### 6.2 Create and activate virtual environment
+### 6.2 Prepare environment variables
+
+Docker Compose reads environment variables from:
+
+```text
+booking_clone/.env
+```
+
+Create it from the template if needed:
+
+```bash
+cp booking_clone/.env.example booking_clone/.env
+```
+
+Recommended values for Docker:
+
+```env
+BOOKING_ENV_ID=dev
+BOOKING_SECRET_KEY=your-secret-key-here
+BOOKING_DEBUG=True
+BOOKING_ALLOWED_HOSTS=localhost,127.0.0.1
+REDIS_HOST=redis
+REDIS_PORT=6379
+FLOWER_USER=admin
+FLOWER_PASSWORD=change_me_in_production
+```
+
+### 6.3 Build and start all services
+
+```bash
+docker compose up --build -d
+```
+
+Services started by Compose:
+
+- `redis`
+- `web` (Django via Daphne)
+- `celery_worker`
+- `celery_beat`
+- `flower`
+- `nginx`
+
+### 6.4 Verify that Compose started successfully
+
+```bash
+docker compose ps
+```
+
+Expected result:
+
+- `redis` is `healthy`
+- `web`, `celery_worker`, `celery_beat`, and `flower` are `Up`
+- `nginx` is also `Up` if host port `80` is available
+
+Useful log checks:
+
+```bash
+docker compose logs --tail=100 web
+docker compose logs --tail=100 celery_worker
+docker compose logs --tail=100 celery_beat
+docker compose logs --tail=100 nginx
+```
+
+### 6.5 Access the running services
+
+If `nginx` starts on port `80`:
+
+- API root: `http://localhost/`
+- Swagger docs: `http://localhost/api/docs/swagger/`
+- ReDoc: `http://localhost/api/docs/redoc/`
+- Flower: `http://localhost:5555/`
+
+### 6.6 If port `80` is already in use
+
+If `nginx` fails with `address already in use`, either free port `80` or change:
+
+```yaml
+ports:
+  - "80:80"
+```
+
+to:
+
+```yaml
+ports:
+  - "8080:80"
+```
+
+Then start again:
+
+```bash
+docker compose up --build -d
+```
+
+After that, open:
+
+- `http://localhost:8080/`
+- `http://localhost:8080/api/docs/swagger/`
+- `http://localhost:8080/api/docs/redoc/`
+
+### 6.7 Run without nginx
+
+If you only want the application and worker containers:
+
+```bash
+docker compose up -d redis web celery_worker celery_beat flower
+```
+
+In this mode, Django is still running inside the `web` container, but it is not directly exposed to the host unless you add a port mapping or run `nginx`.
+
+### 6.8 What starts automatically
+
+When using Docker Compose, you do not need to run Django manually.
+The `web` service starts the application automatically with:
+
+```text
+daphne -b 0.0.0.0 -p 8000 settings.asgi:application
+```
+
+Its entrypoint also:
+
+- waits for Redis
+- runs migrations
+- collects static files
+- compiles translations
+
+### 6.9 Stop the stack
+
+```bash
+docker compose down
+```
+
+Remove containers and volumes:
+
+```bash
+docker compose down -v
+```
+
+---
+
+## 7. Run Locally Without Docker
+
+### 7.1 Enter the app directory
+
+```bash
+cd booking_clone
+```
+
+### 7.2 Create and activate virtual environment
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 6.3 Install dependencies
+### 7.3 Install dependencies
 
 ```bash
 python -m pip install --upgrade pip
-pip install -r requirements.txt
-pip install python-decouple "psycopg[binary]"
+pip install -r ../requirements/dev.txt
 ```
 
----
-
-## 7. PostgreSQL Setup (macOS + Homebrew)
-
-### 7.1 Start PostgreSQL service
+### 7.4 Prepare environment variables
 
 ```bash
-brew services start postgresql@14
-pg_isready -h localhost -p 5432
+cp .env.example .env
 ```
 
-Expected result:
-
-```text
-localhost:5432 - accepting connections
-```
-
-### 7.2 Create DB role and database
-
-```bash
-psql -d postgres -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname='booking_user') THEN CREATE ROLE booking_user LOGIN PASSWORD 'booking_pass_123'; END IF; END \$\$;"
-
-if ! psql -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='booking_clone_db'" | grep -q 1; then
-  createdb -O booking_user booking_clone_db
-fi
-
-psql -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE booking_clone_db TO booking_user;"
-```
-
-### 7.3 Verify role and DB
-
-```bash
-psql -d postgres -c "\\du booking_user"
-psql -d postgres -c "\\l booking_clone_db"
-```
-
----
-
-## 8. Environment Variables (`.env`)
-
-Create `.env` from template:
-
-```bash
-cp .example.env .env
-```
-
-Set values:
+For local development:
 
 ```env
-SECRET_KEY=dev-secret-key-123
-DJANGORLAR_ENV_ID=local
-
-DB_NAME=booking_clone_db
-DB_USER=booking_user
-DB_PASSWORD=booking_pass_123
-DB_HOST=localhost
-DB_PORT=5432
+BOOKING_ENV_ID=dev
+BOOKING_SECRET_KEY=your-secret-key-here
+BOOKING_DEBUG=True
+BOOKING_ALLOWED_HOSTS=localhost,127.0.0.1
+REDIS_HOST=localhost
+REDIS_PORT=6379
 ```
 
----
-
-## 9. Run Project
+### 7.5 Run the project
 
 ```bash
 python manage.py check
-python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
 ```
@@ -214,7 +325,8 @@ python manage.py runserver
 App URLs:
 
 - Admin: `http://127.0.0.1:8000/admin/`
-- API root (City): `http://127.0.0.1:8000/api/cities/`
+- Swagger docs: `http://127.0.0.1:8000/api/docs/swagger/`
+- ReDoc: `http://127.0.0.1:8000/api/docs/redoc/`
 
 ---
 

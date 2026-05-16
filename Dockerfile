@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN useradd -m appuser
 
-COPY requirements/prod.txt /app/requirements/prod.txt
+COPY requirements/ /app/requirements/
 
 RUN pip install --upgrade pip && pip install -r /app/requirements/prod.txt
 

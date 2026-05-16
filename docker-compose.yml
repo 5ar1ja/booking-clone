@@ -1,7 +1,7 @@
 x-app: &app
   build: .
   env_file:
-    - booking_clone/settings/.env
+    - booking_clone/.env
   depends_on:
     redis:
       condition: service_healthy
