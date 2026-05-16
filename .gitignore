@@ -1,77 +1,27 @@
-# =========================
 # Python
-# =========================
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
+.pytest_cache
 
-# Артефакты для ии, например, Claude или GPT
-artifacts/
-
-# Virtual environment
-venv/
-.env/
-.venv/
-
-# logs
-!logs/
-!logs/.gitkeep
-*.log
-
-
-# =========================
-# Environment variables
-# =========================
-.env
-.env.*
-!.env.example
-
-# =========================
 # Django
-# =========================
-local_settings.py
 db.sqlite3
-media/
-staticfiles/
+*.log
+logs/
 
-# Migrations (если хотите игнорировать auto, но обычно НЕ игнорируют)
-# */migrations/*
-# !*/migrations/__init__.py
+# Virtual env
+.env
+venv/
+.venv
+*/venv
+*/.venv
 
-# =========================
-# IDE / Editor
-# =========================
+# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# =========================
-# OS files
-# =========================
+# Ruff
+.ruff_cache
+
+# OS junk
 .DS_Store
-Thumbs.db
-
-# =========================
-# Pytest / coverage
-# =========================
-.coverage
-htmlcov/
-.pytest_cache/
-
-# =========================
-# Redis dump (если локально)
-# =========================
-dump.rdb
-
-# =========================
-# Docker (если будете использовать)
-# =========================
-*.pid
-*.seed
-*.pid.lock
-
-# =========================
-# Celery (если вдруг добавите)
-# =========================
-celerybeat-schedule

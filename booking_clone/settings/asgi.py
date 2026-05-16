@@ -1,16 +1,16 @@
-"""
-ASGI config for booking_clone project.
 
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/
-"""
-
+# Python modules
 import os
 
+# Django modules
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings.base')
+# Project modules
+from settings.conf import ALLOWED_ENV_IDS, ENV_ID
+
+
+assert ENV_ID in ALLOWED_ENV_IDS, f"Invalid ENV_ID: {ENV_ID}. Allowed values are: {ALLOWED_ENV_IDS}"
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"settings.env.{ENV_ID}")
+
 
 application = get_asgi_application()

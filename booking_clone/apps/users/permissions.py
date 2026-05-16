@@ -1,23 +1,39 @@
+from typing import Any
+
 from rest_framework import permissions
+from rest_framework.request import Request
+
 
 class IsAdmin(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return bool(request.user and (request.user.is_staff or request.user.is_superuser))
+    '''Grants access only to staff and superusers.'''
 
-class IsLandlord(permissions.BasePermission):
-    def has_permission(self, request, view):
-        # Rule: User must be logged in AND have the is_landlord flag
+    def has_permission(self, request: Request, view: Any) -> bool:
+        '''Check if the user is a staff member or superuser.'''
         return bool(
-            request.user and 
-            request.user.is_authenticated and 
-            request.user.is_landlord
+            request.user
+            and (request.user.is_staff or request.user.is_superuser)
         )
 
-class IsRenter(permissions.BasePermission):
-    def has_permission(self, request, view):
-        # Rule: User must be logged in AND have the is_renter flag
+
+class IsLandlord(permissions.BasePermission):
+    '''Grants access only to authenticated users with the landlord role.'''
+
+    def has_permission(self, request: Request, view: Any) -> bool:
+        '''Check if the user is authenticated and has the landlord role.'''
         return bool(
-            request.user and 
-            request.user.is_authenticated and 
-            request.user.is_renter
+            request.user
+            and request.user.is_authenticated
+            and request.user.is_landlord
+        )
+
+
+class IsRenter(permissions.BasePermission):
+    '''Grants access only to authenticated users with the renter role.'''
+
+    def has_permission(self, request: Request, view: Any) -> bool:
+        '''Check if the user is authenticated and has the renter role.'''
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and request.user.is_renter
         )

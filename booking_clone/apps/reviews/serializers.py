@@ -1,20 +1,35 @@
 from rest_framework import serializers
+
 from .models import Review
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-
-    author = serializers.ReadOnlyField(source="author.email")
+class ReviewReadSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.email')
+    apartment_title = serializers.ReadOnlyField(source='apartment.title')
 
     class Meta:
         model = Review
         fields = [
-            "id",
-            "apartment",
-            "author",
-            "rating",
-            "comment",
-            "created_at",
+            'id',
+            'apartment',
+            'apartment_title',
+            'author',
+            'rating',
+            'comment',
+            'created_at'
         ]
 
-        read_only_fields = ["author", "created_at"] 
+
+class ReviewWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = [
+            'apartment',
+            'rating',
+            'comment',
+        ]
+
+    def validate_rating(self, value):
+        if not (1 <= value <= 5):
+            raise serializers.ValidationError("Rating must be between 1 and 5.")
+        return value
