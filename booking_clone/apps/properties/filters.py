@@ -13,6 +13,7 @@ from .models import Apartment
 
 
 class ApartmentFilter(django_filters.FilterSet):
+    '''Filter apartments by city, number of rooms, and price range.'''
 
     min_price = django_filters.NumberFilter(
         field_name='price_per_night',

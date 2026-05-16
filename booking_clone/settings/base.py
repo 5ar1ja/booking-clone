@@ -31,7 +31,6 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'django_filters',
-    'debug_toolbar',
     'django_celery_beat',
 ]
 
@@ -47,8 +46,6 @@ PROJECT_APPS = [
 INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
 
 # Celery Configuration Options
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -63,8 +60,6 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-# Email Configuration (using console backend for development)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'support@booking-clone.com'
 
 
@@ -77,7 +72,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 TEMPLATES = [
@@ -130,10 +124,10 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
