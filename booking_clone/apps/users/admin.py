@@ -12,7 +12,7 @@ class CustomUserAdmin(UserAdmin):
     '''Admin interface for the CustomUser model.'''
 
     list_display = (
-        'email', 'first_name', 'last_name',
+        'email', 'first_name', 'last_name', 'avatar',
         'is_landlord', 'is_renter', 'is_active', 'is_staff', 'is_superuser',
     )
     search_fields = ('email', 'first_name', 'last_name')
@@ -21,10 +21,16 @@ class CustomUserAdmin(UserAdmin):
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (_('Personal info'), {'fields': ('first_name', 'last_name')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'avatar')}),
         (_('Roles'), {'fields': ('is_landlord', 'is_renter')}),
         (_('Permissions'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'fields': (
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'groups',
+                'user_permissions',
+            ),
         }),
         (_('Important dates'), {'fields': ('last_login',)}),
     )
@@ -32,6 +38,13 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password', 'first_name', 'last_name', 'is_landlord', 'is_renter'),
+            'fields': (
+                'email',
+                'password',
+                'first_name',
+                'last_name',
+                'is_landlord',
+                'is_renter',
+            ),
         }),
     )

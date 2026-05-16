@@ -1,10 +1,9 @@
-# Python modules
 import logging
-from typing import Any
 
 # Third-party modules
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response as DRFResponse
@@ -14,13 +13,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 # Project modules
 from apps.users.serializers import (
-    UserReadSerializer,
+    LoginResponseSerializer,
     UserLoginSerializer,
+    UserReadSerializer,
     UserRegistrationSerializer,
     UserUpdateSerializer,
-    LoginResponseSerializer,
 )
-
 
 logger = logging.getLogger('apps.users')
 
@@ -28,24 +26,36 @@ logger = logging.getLogger('apps.users')
 @extend_schema_view(
     register=extend_schema(
         summary="Register a new user",
-        description="Create a new user account as either a Landlord or a Renter. Permissions: AllowAny.",
+        description=(
+            "Create a new user account as either a Landlord or a Renter. "
+            "Permissions: AllowAny."
+        ),
         request=UserRegistrationSerializer,
         responses={201: UserReadSerializer},
     ),
     login=extend_schema(
         summary="User login",
-        description="Authenticate user with email and password and return JWT tokens. Permissions: AllowAny.",
+        description=(
+            "Authenticate user with email and password and return JWT tokens. "
+            "Permissions: AllowAny."
+        ),
         request=UserLoginSerializer,
         responses={200: LoginResponseSerializer},
     ),
     fetch_personal_info=extend_schema(
         summary="Get personal info",
-        description="Retrieve current authenticated user's profile details. Permissions: Authenticated only.",
+        description=(
+            "Retrieve current authenticated user's profile details. "
+            "Permissions: Authenticated only."
+        ),
         responses={200: UserReadSerializer},
     ),
     update_profile=extend_schema(
         summary="Update profile",
-        description="Partially update current authenticated user's profile. Permissions: Authenticated only.",
+        description=(
+            "Partially update current authenticated user's profile. "
+            "Permissions: Authenticated only."
+        ),
         request=UserUpdateSerializer,
         responses={200: UserReadSerializer},
     ),
@@ -54,6 +64,7 @@ class CustomUserViewSet(ViewSet):
     '''Handles user registration, login, and profile management using ViewSet.'''
 
     permission_classes = (IsAuthenticated,)
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     @action(
         methods=['post'],
@@ -73,7 +84,8 @@ class CustomUserViewSet(ViewSet):
             user.is_landlord,
             user.is_renter,
         )
-        return DRFResponse(data=UserReadSerializer(user).data, status=HTTP_201_CREATED)
+        read_serializer = UserReadSerializer(user, context={'request': request})
+        return DRFResponse(data=read_serializer.data, status=HTTP_201_CREATED)
 
     @action(
         methods=('post',),
@@ -81,7 +93,7 @@ class CustomUserViewSet(ViewSet):
         url_path='login',
         permission_classes=(AllowAny,),
     )
-    def login(self, request: DRFRequest, *args: Any, **kwargs: Any) -> DRFResponse:
+    def login(self, request: DRFRequest) -> DRFResponse:
         '''Authenticate user and return JWT tokens along with user info.'''
 
         serializer = UserLoginSerializer(data=request.data)
@@ -110,10 +122,10 @@ class CustomUserViewSet(ViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def fetch_personal_info(self, request: DRFRequest) -> DRFResponse:
-        '''Fetch the authenticated user's personal information. Permissions: Authenticated users only.'''
+        '''Fetch the authenticated user's personal information.'''
 
         user = request.user
-        serializer = UserReadSerializer(user)
+        serializer = UserReadSerializer(user, context={'request': request})
         return DRFResponse(data=serializer.data, status=HTTP_200_OK)
 
     @action(
@@ -123,13 +135,13 @@ class CustomUserViewSet(ViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def update_profile(self, request: DRFRequest) -> DRFResponse:
-        '''Update the authenticated user's profile information. Permissions: Authenticated users only.'''
+        '''Update the authenticated user's profile information.'''
 
         user = request.user
         serializer = UserUpdateSerializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user = serializer.save()
         logger.info('Profile updated: %s', request.user.email)
-        
-        read_serializer = UserReadSerializer(user)
+
+        read_serializer = UserReadSerializer(user, context={'request': request})
         return DRFResponse(read_serializer.data, status=HTTP_200_OK)

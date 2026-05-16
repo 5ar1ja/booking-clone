@@ -35,7 +35,7 @@ documentation, localization, Redis caching, and Celery tasks.
 ## Main Features
 
 - Custom `CustomUser` model using `email` instead of `username`.
-- User registration, login, profile view, and profile update.
+- User registration, login, profile view, and profile update with avatar upload.
 - JWT access and refresh tokens.
 - Apartment listing CRUD with landlord permissions.
 - Country and city models for apartment locations.
@@ -97,7 +97,8 @@ booking-clone/
 
 The main database entities are:
 
-- `CustomUser` - email-based user model with landlord and renter roles.
+- `CustomUser` - email-based user model with landlord and renter roles,
+  including an optional avatar image.
 - `Country` - country used for apartment location.
 - `City` - city linked to a country.
 - `Apartment` - rental listing owned by a landlord.
@@ -250,6 +251,24 @@ as `Bearer <access_token>` or through the `token` query parameter.
 - `POST /users/token/refresh/`
 - `GET /users/personal-info/`
 - `PATCH /users/update-profile/`
+
+User profiles include an optional `avatar` field. `GET /users/personal-info/`
+returns the avatar URL when an image is uploaded. `PATCH /users/update-profile/`
+accepts normal JSON updates for profile fields and `multipart/form-data` for
+avatar uploads.
+
+Example avatar update:
+
+```http
+PATCH /users/update-profile/
+Authorization: JWT <access_token>
+Content-Type: multipart/form-data
+
+avatar=<image file>
+```
+
+Uploaded avatars are stored under the configured media root in the `avatars/`
+directory. Local media settings are defined in `booking_clone/settings/base.py`.
 
 ### Apartments
 

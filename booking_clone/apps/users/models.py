@@ -1,9 +1,12 @@
 # Python modules
 from __future__ import annotations
-from typing import Any
 
 # Django modules
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -11,6 +14,8 @@ ERR_EMAIL_REQUIRED = _('Users must have an email address')
 ERR_STAFF_REQUIRED = _('Superuser must have is_staff=True')
 ERR_SUPERUSER_REQUIRED = _('Superuser must have is_superuser=True')
 
+AVATAR_UPLOAD_PATH = 'avatars/'
+ROLE_SUPERUSER = _('Superuser')
 ROLE_LANDLORD = _('Landlord')
 ROLE_RENTER = _('Renter')
 
@@ -19,7 +24,7 @@ class CustomUserManager(BaseUserManager):
     '''Manager for CustomUser using email as the unique identifier.'''
 
     def create_user(
-        self, email: str, password: str | None = None, **extra_fields: Any
+        self, email: str, password: str | None = None, **extra_fields: object
     ) -> CustomUser:
         if not email:
             raise ValueError(ERR_EMAIL_REQUIRED)
@@ -30,7 +35,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(
-        self, email: str, password: str, **extra_fields: Any
+        self, email: str, password: str, **extra_fields: object
     ) -> CustomUser:
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -64,6 +69,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         max_length=255,
         verbose_name=_('Last name'),
         help_text=_('User\'s family name.')
+    )
+    avatar = models.ImageField(
+        upload_to=AVATAR_UPLOAD_PATH,
+        null=True,
+        blank=True,
+        verbose_name=_('Avatar'),
+        help_text=_('Optional profile photo for the user.'),
     )
 
     is_landlord = models.BooleanField(
@@ -102,5 +114,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ]
 
     def __str__(self) -> str:
-        role = 'Superuser' if self.is_superuser else (ROLE_LANDLORD if self.is_landlord else ROLE_RENTER)
+        if self.is_superuser:
+            role = ROLE_SUPERUSER
+        elif self.is_landlord:
+            role = ROLE_LANDLORD
+        else:
+            role = ROLE_RENTER
         return f'{self.email} ({role})'

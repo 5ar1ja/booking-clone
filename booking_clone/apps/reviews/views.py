@@ -8,22 +8,28 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 # Third-party modules
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response
 
-# Project modules
-from apps.core.mixins.views import ActionSerializerMixin, ObjectLookupMixin, PaginationMixin
-from apps.core.pagination import StandardResultsSetPagination
 from apps.bookings.models import Booking
+
+# Project modules
+from apps.core.mixins.views import (
+    ActionSerializerMixin,
+    ObjectLookupMixin,
+    PaginationMixin,
+)
+from apps.core.pagination import StandardResultsSetPagination
+
 from .filters import ReviewFilter
 from .models import Review
 from .permissions import IsReviewAuthorOrReadOnly
 from .serializers import ReviewReadSerializer, ReviewWriteSerializer
-
 
 logger = logging.getLogger('apps.reviews')
 

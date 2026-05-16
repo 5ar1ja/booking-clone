@@ -6,29 +6,34 @@ from typing import Any
 from django.db import transaction
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-<<<<<<< HEAD
-=======
 from django.utils.translation import gettext_lazy as _
->>>>>>> feature/localization
 
 # Third-party modules
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response
 
 # Project modules
-from apps.core.mixins.views import ActionSerializerMixin, ObjectLookupMixin, PaginationMixin
+from apps.core.mixins.views import (
+    ActionSerializerMixin,
+    ObjectLookupMixin,
+    PaginationMixin,
+)
 from apps.core.pagination import StandardResultsSetPagination
 from apps.notifications.models import Notification
 from apps.notifications.utils import notify_after_commit
+
 from .models import Booking
 from .permissions import IsApartmentOwnerForBooking, IsBookingTenant, IsRenterOrReadOnly
-from .serializers import BookingReadSerializer, BookingWriteSerializer, BookingStatusSerializer
-
+from .serializers import (
+    BookingReadSerializer,
+    BookingStatusSerializer,
+    BookingWriteSerializer,
+)
 
 logger = logging.getLogger('apps.bookings')
 
