@@ -1,4 +1,5 @@
 # Django modules
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 
 # Third-party modules
@@ -29,6 +30,16 @@ class TestUserEndpoints:
         user_data['is_renter'] = True
         response = api_client.post(url, user_data)
         
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'non_field_errors' in response.data
+
+    def test_register_user_missing_role(self, api_client, user_data):
+        '''Bad case: Fail to register when neither role is selected.'''
+        url = reverse('users-register')
+        user_data['is_landlord'] = False
+        user_data['is_renter'] = False
+        response = api_client.post(url, user_data)
+
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'non_field_errors' in response.data
 
@@ -82,3 +93,37 @@ class TestUserEndpoints:
         assert response.status_code == status.HTTP_200_OK
         test_user.refresh_from_db()
         assert test_user.first_name == 'UpdatedName'
+
+    def test_create_user_rejects_both_roles(self):
+        with pytest.raises(ValidationError):
+            CustomUser.objects.create_user(
+                email='both@test.com',
+                password='testpass123',
+                first_name='Both',
+                last_name='Roles',
+                is_landlord=True,
+                is_renter=True,
+            )
+
+    def test_create_user_rejects_missing_roles(self):
+        with pytest.raises(ValidationError):
+            CustomUser.objects.create_user(
+                email='norole@test.com',
+                password='testpass123',
+                first_name='No',
+                last_name='Role',
+                is_landlord=False,
+                is_renter=False,
+            )
+
+    def test_create_superuser_allows_no_marketplace_role(self):
+        user = CustomUser.objects.create_superuser(
+            email='admin@test.com',
+            password='testpass123',
+            first_name='Admin',
+            last_name='User',
+        )
+
+        assert user.is_superuser is True
+        assert user.is_landlord is False
+        assert user.is_renter is False

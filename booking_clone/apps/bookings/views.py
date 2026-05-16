@@ -6,10 +6,7 @@ from typing import Any
 from django.db import transaction
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-<<<<<<< HEAD
-=======
 from django.utils.translation import gettext_lazy as _
->>>>>>> feature/localization
 
 # Third-party modules
 from drf_spectacular.types import OpenApiTypes

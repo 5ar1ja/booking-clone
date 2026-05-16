@@ -4,15 +4,15 @@ from typing import Any
 
 # Django modules
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+from apps.users.constants import ERR_ROLE_CONFLICT, ROLE_LANDLORD, ROLE_RENTER
 
 ERR_EMAIL_REQUIRED = _('Users must have an email address')
 ERR_STAFF_REQUIRED = _('Superuser must have is_staff=True')
 ERR_SUPERUSER_REQUIRED = _('Superuser must have is_superuser=True')
-
-ROLE_LANDLORD = _('Landlord')
-ROLE_RENTER = _('Renter')
 
 
 class CustomUserManager(BaseUserManager):
@@ -100,7 +100,31 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             models.Index(fields=['is_landlord']),
             models.Index(fields=['is_renter']),
         ]
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(is_superuser=True)
+                    | (
+                        models.Q(is_landlord=True, is_renter=False)
+                        | models.Q(is_landlord=False, is_renter=True)
+                    )
+                ),
+                name='users_regular_user_has_exactly_one_role',
+                violation_error_message=str(ERR_ROLE_CONFLICT),
+            ),
+        ]
 
     def __str__(self) -> str:
         role = 'Superuser' if self.is_superuser else (ROLE_LANDLORD if self.is_landlord else ROLE_RENTER)
         return f'{self.email} ({role})'
+
+    def clean(self) -> None:
+        if self.is_superuser:
+            return
+
+        if self.is_landlord == self.is_renter:
+            raise ValidationError(ERR_ROLE_CONFLICT)
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.clean()
+        super().save(*args, **kwargs)
