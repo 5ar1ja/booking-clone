@@ -3,7 +3,7 @@ from settings.base import *  # noqa: F403
 
 
 DEBUG = False
-ALLOWED_HOSTS = []  # Add production domains here, e.g. ["yourdomain.com", "www.yourdomain.com"]
+ALLOWED_HOSTS = []  # Add production domains here, e.g. ["somedomain.com", "www.somedomain.com"]
 INTERNAL_IPS = [
     "127.0.0.1",
 ]

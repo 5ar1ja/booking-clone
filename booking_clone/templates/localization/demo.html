@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Localization demo" %} | {% trans "Booking Clone" %}{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <h1>{% trans "Localization demo" %}</h1>
+    <p>
+        {% blocktrans trimmed %}
+            This page shows how the project switches visible interface text between supported languages.
+        {% endblocktrans %}
+    </p>
+    <p>
+        {% trans "Open the language selector above, choose Russian or English, and submit the form." %}
+    </p>
+    <p>
+        {% blocktrans trimmed %}
+            API model labels, validation messages, and this template are prepared for translation.
+        {% endblocktrans %}
+    </p>
+</section>
+{% endblock %}

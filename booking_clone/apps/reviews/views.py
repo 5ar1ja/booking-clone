@@ -5,7 +5,7 @@ from typing import Any
 # Django modules
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
+from django.utils.translation import gettext_lazy as _
 
 # Third-party modules
 from drf_spectacular.types import OpenApiTypes
@@ -27,8 +27,8 @@ from .serializers import ReviewReadSerializer, ReviewWriteSerializer
 
 logger = logging.getLogger('apps.reviews')
 
-ERR_OWN_APARTMENT = 'You cannot review your own apartment.'
-ERR_NOT_STAYED = 'You can only review apartments you have stayed in.'
+ERR_OWN_APARTMENT = _('You cannot review your own apartment.')
+ERR_NOT_STAYED = _('You can only review apartments you have stayed in.')
 
 
 @extend_schema_view(

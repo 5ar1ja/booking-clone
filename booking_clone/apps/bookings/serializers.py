@@ -2,6 +2,9 @@
 from datetime import date
 from typing import Any
 
+# Django modules
+from django.utils.translation import gettext_lazy as _
+
 # Third-party modules
 from rest_framework import serializers
 
@@ -9,7 +12,8 @@ from rest_framework import serializers
 from .models import Booking, ERR_CHECKOUT_BEFORE_CHECKIN
 
 
-ERR_CHECKIN_PAST = 'check_in cannot be in the past'
+ERR_CHECKIN_PAST = _('check_in cannot be in the past')
+ERR_INVALID_STATUS = _('status must be either confirmed or cancelled')
 
 
 class BookingReadSerializer(serializers.ModelSerializer):
@@ -69,9 +73,7 @@ class BookingStatusSerializer(serializers.ModelSerializer):
             Booking.Status.CANCELLED,
         }
         if value not in allowed_statuses:
-            raise serializers.ValidationError(
-                'status must be either confirmed or cancelled'
-            )
+            raise serializers.ValidationError(ERR_INVALID_STATUS)
         return value
 
     class Meta:

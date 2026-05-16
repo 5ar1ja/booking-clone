@@ -1,8 +1,13 @@
+# Django modules
+from django.utils.translation import gettext_lazy as _
+
 # Third-party modules
 from rest_framework import serializers
 
 # Project modules
 from .models import Review
+
+ERR_RATING_RANGE = _('Rating must be between 1 and 5.')
 
 
 class ReviewReadSerializer(serializers.ModelSerializer):
@@ -39,5 +44,5 @@ class ReviewWriteSerializer(serializers.ModelSerializer):
         '''Ensure rating is between 1 and 5.'''
 
         if not (1 <= value <= 5):
-            raise serializers.ValidationError("Rating must be between 1 and 5.")
+            raise serializers.ValidationError(ERR_RATING_RANGE)
         return value

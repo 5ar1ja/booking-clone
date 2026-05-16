@@ -6,6 +6,10 @@ from typing import Any
 from django.db import transaction
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
+<<<<<<< HEAD
+=======
+from django.utils.translation import gettext_lazy as _
+>>>>>>> feature/localization
 
 # Third-party modules
 from drf_spectacular.types import OpenApiTypes
@@ -29,13 +33,13 @@ from .serializers import BookingReadSerializer, BookingWriteSerializer, BookingS
 logger = logging.getLogger('apps.bookings')
 
 DETAIL_FULL_UPDATE_NOT_ALLOWED = (
-    'Full update not allowed. Use /cancel/ or /update-status/.'
+    _('Full update not allowed. Use /cancel/ or /update-status/.')
 )
 DETAIL_PARTIAL_UPDATE_NOT_ALLOWED = (
-    'Partial update not allowed. Use /cancel/ or /update-status/ instead.'
+    _('Partial update not allowed. Use /cancel/ or /update-status/ instead.')
 )
-DETAIL_DELETE_NOT_ALLOWED = 'Deletion not allowed. Use the /cancel/ action instead.'
-DETAIL_ALREADY_CANCELLED = 'Booking is already cancelled.'
+DETAIL_DELETE_NOT_ALLOWED = _('Deletion not allowed. Use the /cancel/ action instead.')
+DETAIL_ALREADY_CANCELLED = _('Booking is already cancelled.')
 
 ACTION_CANCEL = 'cancel'
 ACTION_UPDATE_STATUS = 'update_status'
@@ -184,10 +188,12 @@ class BookingViewSet(
             notify_after_commit(
                 user=booking.apartment.owner,
                 event_type=Notification.EventType.BOOKING_CREATED,
-                message=(
-                    f'New booking request from {request.user.email} '
-                    f'for "{booking.apartment.title}".'
-                ),
+                message=_(
+                    'New booking request from %(email)s for "%(title)s".'
+                ) % {
+                    'email': request.user.email,
+                    'title': booking.apartment.title,
+                },
                 booking=booking,
                 metadata=build_booking_notification_metadata(
                     booking,
@@ -249,7 +255,9 @@ class BookingViewSet(
             notify_after_commit(
                 user=booking.apartment.owner,
                 event_type=Notification.EventType.BOOKING_CANCELLED,
-                message=f'Booking for "{booking.apartment.title}" has been cancelled by the tenant.',
+                message=_('Booking for "%(title)s" has been cancelled by the tenant.') % {
+                    'title': booking.apartment.title,
+                },
                 booking=booking,
                 metadata=build_booking_notification_metadata(
                     booking,
@@ -276,7 +284,10 @@ class BookingViewSet(
             notify_after_commit(
                 user=booking.tenant,
                 event_type=Notification.EventType.BOOKING_STATUS_CHANGED,
-                message=f'Your booking for "{booking.apartment.title}" is now {new_status.upper()}.',
+                message=_('Your booking for "%(title)s" is now %(status)s.') % {
+                    'title': booking.apartment.title,
+                    'status': new_status.upper(),
+                },
                 booking=booking,
                 metadata=build_booking_notification_metadata(
                     booking,

@@ -1,11 +1,13 @@
 # Python modules
 import asyncio
+import json
 import logging
 from typing import AsyncGenerator
 
 # Django modules
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from django.utils.translation import gettext as _
 
 # Third-party modules
 from asgiref.sync import sync_to_async
@@ -87,7 +89,8 @@ async def notification_event_generator(
 
     current_event_id = last_event_id
     logger.info('User %s subscribed to SSE stream from event %s.', user_id, last_event_id)
-    yield 'event: connected\ndata: {"info":"Connected to notification stream"}\n\n'
+    payload = json.dumps({'info': _('Connected to notification stream')})
+    yield f'event: connected\ndata: {payload}\n\n'
 
     while True:
         notifications = await sync_to_async(_get_notifications_for_user)(
@@ -103,17 +106,18 @@ async def notification_event_generator(
         yield ': ping\n\n'
         await asyncio.sleep(SSE_POLL_INTERVAL_SECONDS)
 
+
 async def stream_notifications(request: HttpRequest) -> HttpResponse | StreamingHttpResponse:
     '''
     Async SSE endpoint with JWT auth and replay support via Last-Event-ID.
     '''
     token = _extract_token(request)
     if not token:
-        return HttpResponse('Unauthorized', status=401)
+        return HttpResponse(_('Unauthorized'), status=401)
 
     user = await sync_to_async(get_user_from_jwt)(token)
     if not user:
-        return HttpResponse('Invalid Token', status=401)
+        return HttpResponse(_('Invalid token'), status=401)
 
     last_event_id = _parse_last_event_id(request)
     response = StreamingHttpResponse(
