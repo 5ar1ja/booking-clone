@@ -1,28 +1,35 @@
+# Python modules
 import logging
 from typing import Any
 
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.request import Request as DRFRequest
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
+# Django modules
+from django.db.models import QuerySet
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.shortcuts import get_object_or_404
 
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
+# Third-party modules
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission
+from rest_framework.request import Request as DRFRequest
+from rest_framework.response import Response
 
+# Project modules
 from apps.core.pagination import StandardResultsSetPagination
+from apps.core.mixins.views import ActionSerializerMixin
 from apps.bookings.models import Booking
+from apps.core.pagination import StandardResultsSetPagination
 from apps.reviews.models import Review
 from apps.reviews.serializers import ReviewReadSerializer
 from .filters import ApartmentFilter
 from .models import Apartment
 from .permissions import IsApartmentOwner, IsLandlordOrReadOnly
 from .serializers import ApartmentReadSerializer, ApartmentWriteSerializer
+
 
 logger = logging.getLogger('apps.properties')
 
@@ -105,7 +112,7 @@ logger = logging.getLogger('apps.properties')
         ]
     ),
 )
-class ApartmentViewSet(viewsets.ViewSet):
+class ApartmentViewSet(ActionSerializerMixin, viewsets.ModelViewSet):
     '''
     ViewSet for apartments.
     Uses ApartmentReadSerializer for GET
@@ -116,74 +123,36 @@ class ApartmentViewSet(viewsets.ViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ApartmentFilter
     pagination_class = StandardResultsSetPagination
+    
+    serializer_class = ApartmentReadSerializer
+    serializer_action_classes = {
+        'create': ApartmentWriteSerializer,
+        'update': ApartmentWriteSerializer,
+        'partial_update': ApartmentWriteSerializer,
+    }
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Apartment]:
         return Apartment.objects.select_related('city', 'city__country', 'owner').all()
 
-    def get_object(self, pk):
+    def get_object(self, pk: Any = None) -> Apartment:
         obj = get_object_or_404(self.get_queryset(), pk=pk)
         self.check_object_permissions(self.request, obj)
         return obj
 
-    def get_permissions(self):
+    def get_permissions(self) -> list[BasePermission]:
         if self.action in ['update', 'partial_update', 'destroy']:
             return [IsAuthenticatedOrReadOnly(), IsLandlordOrReadOnly(), IsApartmentOwner()]
         return super().get_permissions()
 
-    def list(self, request: DRFRequest) -> Response:
-        queryset = self.get_queryset()
-        
-        backend = DjangoFilterBackend()
-        queryset = backend.filter_queryset(request, queryset, self)
-        
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(queryset, request, view=self)
-        if page is not None:
-            serializer = ApartmentReadSerializer(page, many=True)
-            return paginator.get_paginated_response(serializer.data)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        logger.info('Apartment created: owner=%s', self.request.user.email)
 
-        serializer = ApartmentReadSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def create(self, request: DRFRequest) -> Response:
-        serializer = ApartmentWriteSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(owner=request.user)
-            logger.info('Apartment created: owner=%s', request.user.email)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
-        apartment = self.get_object(pk)
-        serializer = ApartmentReadSerializer(apartment)
-        return Response(serializer.data)
-
-    def update(self, request: DRFRequest, pk: Any = None) -> Response:
-        apartment = self.get_object(pk)
-        serializer = ApartmentWriteSerializer(apartment, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request: DRFRequest, pk: Any = None) -> Response:
-        apartment = self.get_object(pk)
-        serializer = ApartmentWriteSerializer(apartment, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request: DRFRequest, pk: Any = None) -> Response:
-        apartment = self.get_object(pk)
-        apartment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
     @method_decorator(cache_page(60, key_prefix='apartment_review'))
     @action(detail=True, methods=['get'])
     def reviews(self, request: DRFRequest, pk: Any = None) -> Response:
         '''Returns all reviews for the given apartment (cached 60 s).'''
-        apartment = self.get_object(pk)
+        apartment = self.get_object()
         reviews = Review.objects.filter(apartment=apartment).select_related('author')
         
         paginator = self.pagination_class()
@@ -198,7 +167,7 @@ class ApartmentViewSet(viewsets.ViewSet):
     @action(detail=True, methods=['get'])
     def availability(self, request: DRFRequest, pk: Any = None) -> Response:
         '''Returns apartment info along with occupied date ranges.'''
-        apartment = self.get_object(pk)
+        apartment = self.get_object()
         
         # We only care about bookings that actually block the calendar
         busy_bookings = Booking.objects.filter(

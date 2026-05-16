@@ -1,7 +1,13 @@
-import pytest
+# Django modules
 from django.urls import reverse
+
+# Third-party modules
+import pytest
 from rest_framework import status
+
+# Project modules
 from apps.users.models import CustomUser
+
 
 @pytest.mark.django_db
 class TestUserEndpoints:

@@ -1,6 +1,8 @@
+# Django modules
 from django.contrib.admin import register
 from django.contrib.auth.admin import UserAdmin
 
+# Project modules
 from apps.users.models import CustomUser
 
 

@@ -1,21 +1,28 @@
+# Python modules
+import argparse
 import random
 from datetime import date, timedelta
+from typing import Any
+
+# Django modules
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from apps.users.models import CustomUser
-from apps.properties.models import Country, City, Apartment
+# Project modules
 from apps.bookings.models import Booking
+from apps.properties.models import Country, City, Apartment
 from apps.reviews.models import Review
+from apps.users.models import CustomUser
+
 
 class Command(BaseCommand):
     help = 'Seeds the database with sample data'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
         parser.add_argument('--clear', action='store_true', help='Clear existing data before seeding')
 
     @transaction.atomic
-    def handle(self, *args, **options):
+    def handle(self, *args: Any, **options: Any) -> None:
         if options['clear']:
             self.stdout.write('Clearing existing data...')
             Review.objects.all().delete()

@@ -1,8 +1,13 @@
+# Python modules
 from datetime import date
+from typing import Any
 
+# Third-party modules
 from rest_framework import serializers
 
+# Project modules
 from .models import Booking
+
 
 ERR_CHECKIN_PAST = 'check_in cannot be in the past'
 ERR_CHECKOUT_BEFORE_CHECKIN = 'check_out must be after check_in'
@@ -37,7 +42,7 @@ class BookingWriteSerializer(serializers.ModelSerializer):
             'check_out',
         ]
 
-    def validate(self, data: dict) -> dict:
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         check_in = data.get('check_in')
         check_out = data.get('check_out')
 

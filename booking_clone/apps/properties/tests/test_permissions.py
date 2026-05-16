@@ -1,4 +1,7 @@
+# Third-party modules
 from rest_framework import status
+
+# Project modules
 from .base import BaseApartmentTest
 
 

@@ -1,21 +1,27 @@
-import pytest
-from apps.bookings.models import Booking
-from apps.reviews.models import Review
+# Python modules
 from datetime import date, timedelta
 
-# Import fixtures from properties tests
+# Third-party modules
+import pytest
+
+# Project modules
+from apps.bookings.models import Booking
+from apps.properties.models import Apartment
 from apps.properties.tests.conftest import (
-    api_client, 
-    landlord, 
-    another_landlord, 
-    renter, 
-    country, 
-    city, 
-    apartment
+    api_client,
+    landlord,
+    another_landlord,
+    renter,
+    country,
+    city,
+    apartment,
 )
+from apps.reviews.models import Review
+from apps.users.models import CustomUser
+
 
 @pytest.fixture
-def completed_booking(db, renter, apartment):
+def completed_booking(db, renter: CustomUser, apartment: Apartment) -> Booking:
     return Booking.objects.create(
         tenant=renter,
         apartment=apartment,
@@ -24,8 +30,9 @@ def completed_booking(db, renter, apartment):
         status=Booking.Status.COMPLETED
     )
 
+
 @pytest.fixture
-def pending_booking(db, renter, apartment):
+def pending_booking(db, renter: CustomUser, apartment: Apartment) -> Booking:
     return Booking.objects.create(
         tenant=renter,
         apartment=apartment,
@@ -34,8 +41,9 @@ def pending_booking(db, renter, apartment):
         status=Booking.Status.PENDING
     )
 
+
 @pytest.fixture
-def review(db, renter, apartment, completed_booking):
+def review(db, renter: CustomUser, apartment: Apartment, completed_booking: Booking) -> Review:
     return Review.objects.create(
         apartment=apartment,
         author=renter,

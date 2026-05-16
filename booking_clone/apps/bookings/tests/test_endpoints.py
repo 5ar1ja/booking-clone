@@ -1,8 +1,16 @@
-import pytest
+# Python modules
 from datetime import date, timedelta
+
+# Django modules
 from django.urls import reverse
+
+# Third-party modules
+import pytest
 from rest_framework import status
+
+# Project modules
 from apps.bookings.models import Booking
+
 
 BOOKING_LIST_URL = reverse('booking-list')
 
