@@ -5,6 +5,7 @@ x-app: &app
   environment:
     - BOOKING_ENV_ID=prod
     - DATABASE_URL=postgres://postgres:123456@db:5432/booking
+    - REDIS_HOST=redis
   depends_on:
     redis:
       condition: service_healthy
