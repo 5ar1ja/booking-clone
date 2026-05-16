@@ -4,6 +4,7 @@ from functools import wraps
 # Third-party modules
 from rest_framework.exceptions import PermissionDenied
 
+
 def require_role(role_attr: str):
     """
     Decorator to check if the authenticated user has a specific role attribute.

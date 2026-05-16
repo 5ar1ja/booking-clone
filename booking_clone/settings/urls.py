@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
 
 # Third-party modules
 from drf_spectacular.views import (
@@ -20,6 +21,12 @@ urlpatterns = [
     path('reviews/', include('apps.reviews.urls')),
     path('bookings/', include('apps.bookings.urls')),
     path('notifications/', include('apps.notifications.urls')),
+    path('i18n/', include('django.conf.urls.i18n')),
+    path(
+        'localization/',
+        TemplateView.as_view(template_name='localization/demo.html'),
+        name='localization-demo',
+    ),
 
     # Schema & Docs
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -1,0 +1,564 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: booking-clone\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-16 06:54+0000\n"
+"PO-Revision-Date: 2026-05-16 06:49+0000\n"
+"Last-Translator: Booking Clone Team <team@example.com>\n"
+"Language-Team: en <team@example.com>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/bookings/apps.py:7
+msgid "Bookings"
+msgstr "Bookings"
+
+#: apps/bookings/models.py:11 apps/bookings/serializers.py:9
+msgid "check_out must be after check_in"
+msgstr "check_out must be after check_in"
+
+#: apps/bookings/models.py:12
+msgid "This apartment is already booked for the selected dates"
+msgstr "This apartment is already booked for the selected dates"
+
+#: apps/bookings/models.py:19
+msgid "Pending"
+msgstr "Pending"
+
+#: apps/bookings/models.py:20
+msgid "Confirmed"
+msgstr "Confirmed"
+
+#: apps/bookings/models.py:21
+msgid "Completed"
+msgstr "Completed"
+
+#: apps/bookings/models.py:22
+msgid "Cancelled"
+msgstr "Cancelled"
+
+#: apps/bookings/models.py:28
+msgid "tenant"
+msgstr "tenant"
+
+#: apps/bookings/models.py:29
+msgid "The user who is making the booking."
+msgstr "The user who is making the booking."
+
+#: apps/bookings/models.py:35 apps/properties/models.py:107
+#: apps/reviews/models.py:19
+msgid "apartment"
+msgstr "apartment"
+
+#: apps/bookings/models.py:36
+msgid "The apartment being booked."
+msgstr "The apartment being booked."
+
+#: apps/bookings/models.py:39
+msgid "check-in date"
+msgstr "check-in date"
+
+#: apps/bookings/models.py:41
+msgid "The date the tenant plan to move in."
+msgstr "The date the tenant plan to move in."
+
+#: apps/bookings/models.py:44
+msgid "check-out date"
+msgstr "check-out date"
+
+#: apps/bookings/models.py:46
+msgid "The date the tenant plan to move out."
+msgstr "The date the tenant plan to move out."
+
+#: apps/bookings/models.py:49
+msgid "status"
+msgstr "status"
+
+#: apps/bookings/models.py:54
+msgid "The current lifecycle stage of the booking."
+msgstr "The current lifecycle stage of the booking."
+
+#: apps/bookings/models.py:57
+msgid "total price"
+msgstr "total price"
+
+#: apps/bookings/models.py:62
+msgid "The total cost of the stay, auto-calculated based on nights."
+msgstr "The total cost of the stay, auto-calculated based on nights."
+
+#: apps/bookings/models.py:65 apps/properties/models.py:100
+#: apps/reviews/models.py:40
+msgid "created at"
+msgstr "created at"
+
+#: apps/bookings/models.py:68
+msgid "The date and time when this booking record was created."
+msgstr "The date and time when this booking record was created."
+
+#: apps/bookings/models.py:72
+msgid "booking"
+msgstr "booking"
+
+#: apps/bookings/models.py:73
+msgid "bookings"
+msgstr "bookings"
+
+#: apps/bookings/serializers.py:8
+msgid "check_in cannot be in the past"
+msgstr "check_in cannot be in the past"
+
+#: apps/bookings/serializers.py:10
+msgid "status must be either confirmed or cancelled"
+msgstr "status must be either confirmed or cancelled"
+
+#: apps/bookings/views.py:28
+msgid "Full update not allowed. Use /cancel/ or /update-status/."
+msgstr "Full update not allowed. Use /cancel/ or /update-status/."
+
+#: apps/bookings/views.py:31
+msgid "Partial update not allowed. Use /cancel/ or /update-status/ instead."
+msgstr "Partial update not allowed. Use /cancel/ or /update-status/ instead."
+
+#: apps/bookings/views.py:33
+msgid "Deletion not allowed. Use the /cancel/ action instead."
+msgstr "Deletion not allowed. Use the /cancel/ action instead."
+
+#: apps/bookings/views.py:34
+msgid "Booking is already cancelled."
+msgstr "Booking is already cancelled."
+
+#: apps/bookings/views.py:164
+#, python-format
+msgid "New booking request from %(email)s for \"%(title)s\"."
+msgstr "New booking request from %(email)s for \"%(title)s\"."
+
+#: apps/bookings/views.py:221
+#, python-format
+msgid "Booking for \"%(title)s\" has been cancelled by the tenant."
+msgstr "Booking for \"%(title)s\" has been cancelled by the tenant."
+
+#: apps/bookings/views.py:249
+#, python-format
+msgid "Your booking for \"%(title)s\" is now %(status)s."
+msgstr "Your booking for \"%(title)s\" is now %(status)s."
+
+#: apps/notifications/apps.py:8 apps/notifications/models.py:59
+msgid "Notifications"
+msgstr "Notifications"
+
+#: apps/notifications/models.py:10
+msgid "Booking created"
+msgstr "Booking created"
+
+#: apps/notifications/models.py:11
+msgid "Booking status changed"
+msgstr "Booking status changed"
+
+#: apps/notifications/models.py:12
+msgid "Booking cancelled"
+msgstr "Booking cancelled"
+
+#: apps/notifications/models.py:18
+msgid "Recipient"
+msgstr "Recipient"
+
+#: apps/notifications/models.py:19
+msgid "The user who will receive this notification."
+msgstr "The user who will receive this notification."
+
+#: apps/notifications/models.py:27
+msgid "Booking"
+msgstr "Booking"
+
+#: apps/notifications/models.py:28
+msgid "The booking related to this notification, when applicable."
+msgstr "The booking related to this notification, when applicable."
+
+#: apps/notifications/models.py:33
+msgid "Event type"
+msgstr "Event type"
+
+#: apps/notifications/models.py:34
+msgid "Machine-readable notification event type."
+msgstr "Machine-readable notification event type."
+
+#: apps/notifications/models.py:37
+msgid "Message"
+msgstr "Message"
+
+#: apps/notifications/models.py:38
+msgid "Human-readable notification message."
+msgstr "Human-readable notification message."
+
+#: apps/notifications/models.py:43
+msgid "Metadata"
+msgstr "Metadata"
+
+#: apps/notifications/models.py:44
+msgid "Structured event payload for clients."
+msgstr "Structured event payload for clients."
+
+#: apps/notifications/models.py:48
+msgid "Is read"
+msgstr "Is read"
+
+#: apps/notifications/models.py:49
+msgid "Whether the user has seen this notification."
+msgstr "Whether the user has seen this notification."
+
+#: apps/notifications/models.py:53
+msgid "Created at"
+msgstr "Created at"
+
+#: apps/notifications/models.py:54
+msgid "When the notification was generated."
+msgstr "When the notification was generated."
+
+#: apps/notifications/models.py:58
+msgid "Notification"
+msgstr "Notification"
+
+#: apps/notifications/views.py:85
+msgid "Connected to notification stream"
+msgstr "Connected to notification stream"
+
+#: apps/notifications/views.py:108
+msgid "Unauthorized"
+msgstr "Unauthorized"
+
+#: apps/notifications/views.py:112
+msgid "Invalid token"
+msgstr "Invalid token"
+
+#: apps/properties/apps.py:7
+msgid "Properties"
+msgstr "Properties"
+
+#: apps/properties/models.py:11 apps/properties/models.py:30
+msgid "name"
+msgstr "name"
+
+#: apps/properties/models.py:14
+msgid "The unique name of the country."
+msgstr "The unique name of the country."
+
+#: apps/properties/models.py:18 apps/properties/models.py:40
+msgid "country"
+msgstr "country"
+
+#: apps/properties/models.py:19
+msgid "countries"
+msgstr "countries"
+
+#: apps/properties/models.py:32
+msgid "The name of the city."
+msgstr "The name of the city."
+
+#: apps/properties/models.py:41
+msgid "The country this city belongs to."
+msgstr "The country this city belongs to."
+
+#: apps/properties/models.py:46 apps/properties/models.py:75
+msgid "city"
+msgstr "city"
+
+#: apps/properties/models.py:47
+msgid "cities"
+msgstr "cities"
+
+#: apps/properties/models.py:58
+msgid "title"
+msgstr "title"
+
+#: apps/properties/models.py:60
+msgid "The title of the apartment listing."
+msgstr "The title of the apartment listing."
+
+#: apps/properties/models.py:63
+msgid "description"
+msgstr "description"
+
+#: apps/properties/models.py:64
+msgid "A detailed description of the apartment."
+msgstr "A detailed description of the apartment."
+
+#: apps/properties/models.py:67
+msgid "address"
+msgstr "address"
+
+#: apps/properties/models.py:69
+msgid "The physical address of the apartment."
+msgstr "The physical address of the apartment."
+
+#: apps/properties/models.py:76
+msgid "The city where the apartment is located."
+msgstr "The city where the apartment is located."
+
+#: apps/properties/models.py:79
+msgid "price per night"
+msgstr "price per night"
+
+#: apps/properties/models.py:84
+msgid "The cost to rent the apartment for one night."
+msgstr "The cost to rent the apartment for one night."
+
+#: apps/properties/models.py:87
+msgid "rooms"
+msgstr "rooms"
+
+#: apps/properties/models.py:90
+msgid "The number of rooms available in the apartment."
+msgstr "The number of rooms available in the apartment."
+
+#: apps/properties/models.py:96
+msgid "owner"
+msgstr "owner"
+
+#: apps/properties/models.py:97
+msgid "The user who owns this apartment listing."
+msgstr "The user who owns this apartment listing."
+
+#: apps/properties/models.py:103
+msgid "The date and time when the listing was created."
+msgstr "The date and time when the listing was created."
+
+#: apps/properties/models.py:108
+msgid "apartments"
+msgstr "apartments"
+
+#: apps/reviews/apps.py:7
+msgid "Reviews"
+msgstr "Reviews"
+
+#: apps/reviews/models.py:20
+msgid "The apartment being reviewed."
+msgstr "The apartment being reviewed."
+
+#: apps/reviews/models.py:26
+msgid "author"
+msgstr "author"
+
+#: apps/reviews/models.py:27
+msgid "The user who wrote the review."
+msgstr "The user who wrote the review."
+
+#: apps/reviews/models.py:30
+msgid "rating"
+msgstr "rating"
+
+#: apps/reviews/models.py:33
+msgid "The rating given by the user (1-5)."
+msgstr "The rating given by the user (1-5)."
+
+#: apps/reviews/models.py:36
+msgid "comment"
+msgstr "comment"
+
+#: apps/reviews/models.py:37
+msgid "The textual feedback from the user."
+msgstr "The textual feedback from the user."
+
+#: apps/reviews/models.py:43
+msgid "The date and time when the review was created."
+msgstr "The date and time when the review was created."
+
+#: apps/reviews/models.py:46
+msgid "updated at"
+msgstr "updated at"
+
+#: apps/reviews/models.py:48
+msgid "The date and time when the review was last updated."
+msgstr "The date and time when the review was last updated."
+
+#: apps/reviews/models.py:52
+msgid "review"
+msgstr "review"
+
+#: apps/reviews/models.py:53
+msgid "reviews"
+msgstr "reviews"
+
+#: apps/reviews/serializers.py:6
+msgid "Rating must be between 1 and 5."
+msgstr "Rating must be between 1 and 5."
+
+#: apps/reviews/views.py:27
+msgid "You cannot review your own apartment."
+msgstr "You cannot review your own apartment."
+
+#: apps/reviews/views.py:28
+msgid "You can only review apartments you have stayed in."
+msgstr "You can only review apartments you have stayed in."
+
+#: apps/users/admin.py:20
+msgid "Personal info"
+msgstr "Personal info"
+
+#: apps/users/admin.py:21
+msgid "Roles"
+msgstr "Roles"
+
+#: apps/users/admin.py:22
+msgid "Permissions"
+msgstr "Permissions"
+
+#: apps/users/admin.py:25
+msgid "Important dates"
+msgstr "Important dates"
+
+#: apps/users/apps.py:8 apps/users/models.py:94
+msgid "Users"
+msgstr "Users"
+
+#: apps/users/models.py:7
+msgid "Users must have an email address"
+msgstr "Users must have an email address"
+
+#: apps/users/models.py:8
+msgid "Superuser must have is_staff=True"
+msgstr "Superuser must have is_staff=True"
+
+#: apps/users/models.py:9
+msgid "Superuser must have is_superuser=True"
+msgstr "Superuser must have is_superuser=True"
+
+#: apps/users/models.py:11
+msgid "Landlord"
+msgstr "Landlord"
+
+#: apps/users/models.py:12
+msgid "Renter"
+msgstr "Renter"
+
+#: apps/users/models.py:52
+msgid "Email address"
+msgstr "Email address"
+
+#: apps/users/models.py:53
+msgid "Unique identifier for the user."
+msgstr "Unique identifier for the user."
+
+#: apps/users/models.py:57
+msgid "First name"
+msgstr "First name"
+
+#: apps/users/models.py:58
+msgid "User's given name."
+msgstr "User's given name."
+
+#: apps/users/models.py:62
+msgid "Last name"
+msgstr "Last name"
+
+#: apps/users/models.py:63
+msgid "User's family name."
+msgstr "User's family name."
+
+#: apps/users/models.py:68
+msgid "Is landlord"
+msgstr "Is landlord"
+
+#: apps/users/models.py:69
+msgid "Designates whether the user can list apartments."
+msgstr "Designates whether the user can list apartments."
+
+#: apps/users/models.py:73
+msgid "Is renter"
+msgstr "Is renter"
+
+#: apps/users/models.py:74
+msgid "Designates whether the user can book apartments."
+msgstr "Designates whether the user can book apartments."
+
+#: apps/users/models.py:78
+msgid "Is active"
+msgstr "Is active"
+
+#: apps/users/models.py:79
+msgid "Designates whether this user should be treated as active."
+msgstr "Designates whether this user should be treated as active."
+
+#: apps/users/models.py:83
+msgid "Is staff"
+msgstr "Is staff"
+
+#: apps/users/models.py:84
+msgid "Designates whether the user can log into this admin site."
+msgstr "Designates whether the user can log into this admin site."
+
+#: apps/users/models.py:93
+msgid "User"
+msgstr "User"
+
+#: apps/users/serializers.py:9
+msgid "You must choose exactly one role: Landlord or Renter."
+msgstr "You must choose exactly one role: Landlord or Renter."
+
+#: apps/users/serializers.py:10
+msgid "Invalid email or password."
+msgstr "Invalid email or password."
+
+#: apps/users/serializers.py:11
+msgid "User account is disabled."
+msgstr "User account is disabled."
+
+#: apps/users/serializers.py:12
+msgid "Must include 'email' and 'password'."
+msgstr "Must include 'email' and 'password'."
+
+#: settings/base.py:117
+msgid "English"
+msgstr "English"
+
+#: settings/base.py:118
+msgid "Russian"
+msgstr "Russian"
+
+#: templates/base.html:8 templates/base.html:56
+#: templates/localization/demo.html:4
+msgid "Booking Clone"
+msgstr "Booking Clone"
+
+#: templates/base.html:60
+msgid "Language"
+msgstr "Language"
+
+#: templates/base.html:68
+msgid "Change"
+msgstr "Change"
+
+#: templates/localization/demo.html:4 templates/localization/demo.html:8
+msgid "Localization demo"
+msgstr "Localization demo"
+
+#: templates/localization/demo.html:10
+msgid ""
+"This page shows how the project switches visible interface text between "
+"supported languages."
+msgstr ""
+"This page shows how the project switches visible interface text between "
+"supported languages."
+
+#: templates/localization/demo.html:15
+msgid ""
+"Open the language selector above, choose Russian or English, and submit the "
+"form."
+msgstr ""
+"Open the language selector above, choose Russian or English, and submit the "
+"form."
+
+#: templates/localization/demo.html:18
+msgid ""
+"API model labels, validation messages, and this template are prepared for "
+"translation."
+msgstr ""
+"API model labels, validation messages, and this template are prepared for "
+"translation."

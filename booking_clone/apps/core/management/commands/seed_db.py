@@ -34,7 +34,7 @@ class Command(BaseCommand):
 
         self.stdout.write('Seeding data...')
 
-        # 1. Create Users
+        # Create Users
         landlords = []
         for i in range(5):
             email = f'landlord{i}@example.com'
@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 user.save()
             renters.append(user)
 
-        # 2. Create Countries and Cities
+        # Create Countries and Cities
         countries_data = {
             'Kazakhstan': ['Almaty', 'Astana', 'Shymkent'],
             'France': ['Paris', 'Lyon', 'Marseille'],
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 city, _ = City.objects.get_or_create(name=city_name, country=country)
                 cities.append(city)
 
-        # 3. Create Apartments
+        # Create Apartments
         apartments = []
         titles = ['Cozy Studio', 'Luxury Penthouse', 'Modern Loft', 'Quiet Garden Apartment', 'Central Suite']
         for i in range(20):
@@ -91,7 +91,7 @@ class Command(BaseCommand):
             )
             apartments.append(apt)
 
-        # 4. Create Bookings and Reviews
+        # Create Bookings and Reviews
         for renter in renters:
             # Each renter makes 2-4 bookings
             num_bookings = random.randint(2, 4)
