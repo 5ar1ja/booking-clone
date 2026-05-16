@@ -6,7 +6,7 @@ set -o pipefail
 # CONFIGURATION
 # ----------------------------------
 
-ENV_FILE=".env"
+ENV_FILE="booking_clone/settings/.env"
 VENV_DIR=".venv"
 APP_DIR="booking_clone"
 DJANGO_MANAGE="python $APP_DIR/manage.py"

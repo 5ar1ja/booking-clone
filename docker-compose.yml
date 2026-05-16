@@ -46,7 +46,7 @@ services:
   flower:
     <<: *app
     entrypoint: []
-    command: sh -c "celery -A settings.celery flower --basic-auth=$${FLOWER_USER}:$${FLOWER_PASSWORD}"
+    command: celery -A settings.celery flower --basic-auth=$${FLOWER_USER}:$${FLOWER_PASSWORD}
     ports:
       - "5555:5555"
 
