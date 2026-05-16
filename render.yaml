@@ -1,9 +1,7 @@
 services:
   - type: web
     name: booking-clone-api
-    env: python
-    buildCommand: "./build.sh"
-    startCommand: "cd booking_clone && gunicorn settings.wsgi:application"
+    env: docker
     envVars:
       - key: DATABASE_URL
         fromDatabase:
