@@ -2,12 +2,33 @@ x-app: &app
   build: .
   env_file:
     - booking_clone/.env
+  environment:
+    - BOOKING_ENV_ID=prod
+    - DATABASE_URL=postgres://postgres:123456@db:5432/booking
   depends_on:
     redis:
+      condition: service_healthy
+    db:
       condition: service_healthy
   restart: unless-stopped
 
 services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: booking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    expose:
+      - "5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d booking"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
   redis:
     image: redis:7-alpine
     expose:
@@ -23,7 +44,6 @@ services:
     <<: *app
     command: daphne -b 0.0.0.0 -p 8000 settings.asgi:application
     volumes:
-      - sqlite_data:/app/data
       - static_volume:/app/booking_clone/staticfiles
       - media_volume:/app/booking_clone/mediafiles
     expose:
@@ -33,15 +53,11 @@ services:
     <<: *app
     entrypoint: []
     command: sh -c "celery -A settings.celery worker -l info"
-    volumes:
-      - sqlite_data:/app/data
 
   celery_beat:
     <<: *app
     entrypoint: []
     command: sh -c "celery -A settings.celery beat -l info"
-    volumes:
-      - sqlite_data:/app/data
 
   flower:
     <<: *app
@@ -63,6 +79,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  sqlite_data:
+  pg_data:
   static_volume:
   media_volume:
