@@ -6,13 +6,14 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from apps.core.mixins.models import TimestampedModel
 from apps.properties.models import Apartment
 
 ERR_CHECKOUT_BEFORE_CHECKIN = _('check_out must be after check_in')
 ERR_DATES_OVERLAP = _('This apartment is already booked for the selected dates')
 
 
-class Booking(models.Model):
+class Booking(TimestampedModel):
     """Represents a reservation for an apartment by a tenant."""
 
     class Status(models.TextChoices):
@@ -60,12 +61,6 @@ class Booking(models.Model):
         blank=True,
         validators=[MinValueValidator(0)],
         help_text=_('The total cost of the stay, auto-calculated based on nights.'),
-    )
-    created_at = models.DateTimeField(
-        _('created at'),
-        auto_now_add=True,
-        db_index=True,
-        help_text=_('The date and time when this booking record was created.'),
     )
 
     class Meta:

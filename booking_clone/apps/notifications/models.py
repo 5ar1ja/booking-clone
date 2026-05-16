@@ -1,8 +1,10 @@
 from django.conf import settings
 from django.db import models
 
+from apps.core.mixins.models import TimestampedModel
 
-class Notification(models.Model):
+
+class Notification(TimestampedModel):
     '''Stores durable user notifications for API access and SSE replay.'''
 
     class EventType(models.TextChoices):
@@ -46,11 +48,6 @@ class Notification(models.Model):
         default=False,
         verbose_name='Is read',
         help_text='Whether the user has seen this notification.',
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Created at',
-        help_text='When the notification was generated.',
     )
 
     class Meta:
