@@ -1,15 +1,24 @@
+# Python modules
+from typing import Any
+
+# Third-party modules
 from rest_framework import serializers
 
+# Project modules
 from .models import Apartment, City, Country
 
 
 class CountrySerializer(serializers.ModelSerializer):
+    '''Serializer for Country model.'''
+
     class Meta:
         model = Country
         fields = ['id', 'name']
 
 
 class CitySerializer(serializers.ModelSerializer):
+    '''Serializer for City model; includes nested country info.'''
+
     country = CountrySerializer(read_only=True)
     class Meta:
         model = City
@@ -17,6 +26,8 @@ class CitySerializer(serializers.ModelSerializer):
 
 
 class ApartmentReadSerializer(serializers.ModelSerializer):
+    '''Serializer for reading apartment data; includes nested city and owner info.'''
+
     owner = serializers.ReadOnlyField(source='owner.email')
     city = CitySerializer(read_only=True)
     class Meta:
@@ -36,6 +47,8 @@ class ApartmentReadSerializer(serializers.ModelSerializer):
 
 
 class ApartmentWriteSerializer(serializers.ModelSerializer):
+    '''Serializer for creating/updating an apartment; accepts city_id instead of nested city.'''
+
     city_id = serializers.PrimaryKeyRelatedField(
         queryset=City.objects.all(),
         source='city',
@@ -52,5 +65,8 @@ class ApartmentWriteSerializer(serializers.ModelSerializer):
             'rooms',
         ]
         
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, Any]) -> Apartment:
+        '''Set the owner to the authenticated user when creating an apartment.'''
+
+        validated_data['owner'] = self.context['request'].user   
         return super().create(validated_data)

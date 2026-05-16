@@ -1,10 +1,15 @@
+# Django modules
 from django.contrib import admin
 
+# Project modules
 from .models import Booking
 
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
+    '''Admin interface for the Booking model.
+    Displays key fields and allows filtering by status and dates.'''
+
     list_display = (
         'id', 'tenant', 'apartment',
         'check_in', 'check_out', 'status', 'total_price', 'created_at',

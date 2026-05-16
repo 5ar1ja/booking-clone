@@ -1,10 +1,19 @@
+# Python modules
+from typing import Any
+
+# Django modules
+from django.db.models import QuerySet
+
+# Third-party modules
 import django_filters
-from django.db.models import Q
+
+# Project modules
 from apps.bookings.models import Booking
 from .models import Apartment
 
 
 class ApartmentFilter(django_filters.FilterSet):
+    '''Filter apartments by city, number of rooms, and price range.'''
 
     min_price = django_filters.NumberFilter(
         field_name='price_per_night',
@@ -24,7 +33,7 @@ class ApartmentFilter(django_filters.FilterSet):
         model = Apartment
         fields = ['city', 'rooms']
 
-    def filter_availability(self, queryset, name, value):
+    def filter_availability(self, queryset: QuerySet[Apartment], name: str, value: Any) -> QuerySet[Apartment]:
         """
         Excludes apartments that have overlapping bookings for the given dates.
         Requires both check_in and check_out to be present in the request.

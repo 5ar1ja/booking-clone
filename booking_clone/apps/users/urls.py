@@ -1,11 +1,15 @@
-from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenRefreshView
-
+# Django modules
 from django.conf.urls.static import static
 from django.urls import path, include
 
+# Third-party modules
+from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenRefreshView
+
+# Project modules
 from apps.users.views import CustomUserViewSet
 from settings.base import MEDIA_ROOT, MEDIA_URL
+
 
 router = DefaultRouter()
 router.register(r'', CustomUserViewSet, basename='users')

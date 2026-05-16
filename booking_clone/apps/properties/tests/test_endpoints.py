@@ -1,9 +1,12 @@
-import pytest
-
-from apps.properties.models import Apartment
+# Django modules
 from django.urls import reverse
 
+# Third-party modules
+import pytest
 from rest_framework import status
+
+# Project modules
+from apps.properties.models import Apartment
 
 
 @pytest.mark.django_db

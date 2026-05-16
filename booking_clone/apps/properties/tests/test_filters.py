@@ -1,5 +1,10 @@
+# Python modules
 from datetime import date, timedelta
+
+# Third-party modules
 from rest_framework import status
+
+# Project modules
 from apps.bookings.models import Booking
 from .base import BaseApartmentTest
 

@@ -1,14 +1,24 @@
+# Python modules
 from datetime import date
+from typing import Any
 
+# Django modules
+from django.utils.translation import gettext_lazy as _
+
+# Third-party modules
 from rest_framework import serializers
 
+# Project modules
+from apps.bookings.constants import ERR_CHECKOUT_BEFORE_CHECKIN
 from .models import Booking
 
-ERR_CHECKIN_PAST = 'check_in cannot be in the past'
-ERR_CHECKOUT_BEFORE_CHECKIN = 'check_out must be after check_in'
+ERR_CHECKIN_PAST = _('check_in cannot be in the past')
+ERR_INVALID_STATUS = _('status must be either confirmed or cancelled')
 
 
 class BookingReadSerializer(serializers.ModelSerializer):
+    '''Serializer for reading booking data; includes nested apartment and renter info.'''
+
     tenant = serializers.ReadOnlyField(source='tenant.email')
     apartment_title = serializers.ReadOnlyField(source='apartment.title')
 
@@ -29,6 +39,8 @@ class BookingReadSerializer(serializers.ModelSerializer):
 
 
 class BookingWriteSerializer(serializers.ModelSerializer):
+    '''Serializer for creating a booking; validates that check-out is after check-in'''
+
     class Meta:
         model = Booking
         fields = [
@@ -37,7 +49,9 @@ class BookingWriteSerializer(serializers.ModelSerializer):
             'check_out',
         ]
 
-    def validate(self, data: dict) -> dict:
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        '''Reject overlapping bookings for the same apartment.'''
+        
         check_in = data.get('check_in')
         check_out = data.get('check_out')
 
@@ -59,9 +73,7 @@ class BookingStatusSerializer(serializers.ModelSerializer):
             Booking.Status.CANCELLED,
         }
         if value not in allowed_statuses:
-            raise serializers.ValidationError(
-                'status must be either confirmed or cancelled'
-            )
+            raise serializers.ValidationError(ERR_INVALID_STATUS)
         return value
 
     class Meta:

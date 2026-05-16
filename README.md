@@ -1,369 +1,257 @@
-# Booking Clone — Team Backend Project (Django + DRF + PostgreSQL)
+# Booking Clone - Django REST Framework Backend
 
-This repository contains our team backend project: a simplified booking service API.
-The project is built for university practice and is organized as incremental modules
-(properties, users/auth, bookings, reviews, logging).
+Booking Clone is a university backend project that implements a simplified
+apartment booking platform. The current `develop` branch contains REST API
+modules for users, apartments, bookings, reviews, notifications, API
+documentation, localization, Redis caching, and Celery tasks.
 
----
+## Project Goals
 
-## 1. Project Goal
+- Build a real backend service with Django and Django REST Framework.
+- Use a custom user model with email-based authentication.
+- Provide JWT authentication for protected API endpoints.
+- Model apartments, locations, bookings, reviews, and notifications.
+- Document API endpoints with Swagger and ReDoc.
+- Demonstrate background processing, Redis usage, SSE, and localization.
+- Keep the project organized for team development through feature branches.
 
-The goal of this project is to learn how to design a real backend service in stages:
-
-- model domain entities in Django ORM
-- expose REST API with Django REST Framework
-- work with PostgreSQL as the main DB
-- use team workflow with feature branches and pull requests
-
-Think of the project as a constructor:
-
-- models = "what data we store"
-- serializers = "how data is transformed to/from JSON"
-- viewsets = "what actions API supports"
-- router/urls = "where endpoints are available"
-
----
-
-## 2. Implemented Module in This Branch: City
-
-### 2.1 Business requirement
-
-Entity: `City`
-
-Fields:
-
-- `name` — `CharField`
-- `country` — `CharField`
-- `created_at` — `DateTimeField(auto_now_add=True)`
-
-Constraint:
-
-- pair `name + country` must be unique
-
-### 2.2 Why this uniqueness rule is important
-
-City names are not globally unique (`Paris` can exist in different countries),
-but duplicate cities inside the same country should be blocked.
-
-Examples:
-
-- `Paris, France` + `Paris, USA` -> valid
-- `Paris, France` + `Paris, France` -> invalid
-
----
-
-## 3. Architecture of the City API
-
-```
-HTTP request
-    |
-    v
-URL Router (/api/cities/...)
-    |
-    v
-CityViewSet (CRUD actions)
-    |
-    v
-CitySerializer (validation + JSON transform)
-    |
-    v
-City model (ORM) <-> PostgreSQL
-```
-
-### Layer responsibilities
-
-- **Model**: schema and DB constraints
-- **Serializer**: input/output validation and representation
-- **ViewSet**: REST actions (`list/create/retrieve/update/destroy`)
-- **Router**: endpoint registration
-
----
-
-## 4. Tech Stack
+## Tech Stack
 
 - Python 3.14+
 - Django 6.0.2
 - Django REST Framework 3.16.1
-- PostgreSQL 14+
-- `python-dotenv`, `python-decouple`
-- `psycopg` (PostgreSQL driver)
+- Simple JWT
+- drf-spectacular
+- django-filter
+- django-redis
+- Celery
+- django-celery-beat
+- Redis
+- SQLite for local development
+- PostgreSQL settings for production
+- pytest / pytest-django
+- Ruff
 
----
+## Main Features
 
-## 5. Repository Structure
+- Custom `CustomUser` model using `email` instead of `username`.
+- User registration, login, profile view, and profile update.
+- JWT access and refresh tokens.
+- Apartment listing CRUD with landlord permissions.
+- Country and city models for apartment locations.
+- Booking workflow with `pending`, `confirmed`, `completed`, and `cancelled`
+  statuses.
+- Review workflow for users who completed a stay.
+- Notification storage and notification API.
+- Server-Sent Events endpoint for notification streaming.
+- Redis cache support.
+- Celery task for booking confirmation email.
+- Celery Beat task for cleaning stale pending bookings.
+- English and Russian localization.
+- Swagger and ReDoc API documentation.
+- Database seeding command.
+- Centralized logging configuration.
+
+## Repository Structure
 
 ```text
 booking-clone/
 ├── booking_clone/
 │   ├── apps/
-│   │   ├── properties/
-│   │   │   ├── migrations/
-│   │   │   ├── models.py
-│   │   │   ├── serializers.py
-│   │   │   ├── views.py
-│   │   │   └── urls.py
-│   │   ├── users/
 │   │   ├── bookings/
-│   │   └── reviews/
+│   │   ├── core/
+│   │   ├── notifications/
+│   │   ├── properties/
+│   │   ├── reviews/
+│   │   └── users/
+│   ├── locale/
+│   │   ├── en/
+│   │   └── ru/
+│   ├── logs/
 │   ├── settings/
+│   │   ├── env/
+│   │   │   ├── dev.py
+│   │   │   └── prod.py
+│   │   ├── asgi.py
 │   │   ├── base.py
+│   │   ├── celery.py
 │   │   ├── conf.py
-│   │   └── urls.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── templates/
+│   ├── .env.example
 │   ├── manage.py
-│   ├── requirements.txt
-│   └── .example.env
+│   └── pytest.ini
+├── docs/
+│   ├── ERD.png
+│   └── localization_internationalization.md
+├── requirements/
+│   ├── base.txt
+│   ├── dev.txt
+│   └── prod.txt
+├── pyproject.toml
 └── README.md
 ```
 
----
+## Domain Models
 
-## 6. Environment Setup (Step-by-Step)
+The main database entities are:
 
-### 6.1 Clone and enter project
+- `CustomUser` - email-based user model with landlord and renter roles.
+- `Country` - country used for apartment location.
+- `City` - city linked to a country.
+- `Apartment` - rental listing owned by a landlord.
+- `Booking` - apartment reservation made by a renter.
+- `Review` - rating and comment for an apartment.
+- `Notification` - stored user notification, used by API and SSE streaming.
+
+The ER diagram is stored in:
+
+```text
+docs/ERD.png
+```
+
+## Setup
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/5ar1ja/booking-clone.git
 cd booking-clone/booking_clone
 ```
 
-### 6.2 Create and activate virtual environment
+### 2. Create and activate a virtual environment
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 6.3 Install dependencies
+### 3. Install dependencies
 
 ```bash
 python -m pip install --upgrade pip
-pip install -r requirements.txt
-pip install python-decouple "psycopg[binary]"
+pip install -r ../requirements/dev.txt
 ```
 
----
-
-## 7. PostgreSQL Setup (macOS + Homebrew)
-
-### 7.1 Start PostgreSQL service
+### 4. Configure environment variables
 
 ```bash
-brew services start postgresql@14
-pg_isready -h localhost -p 5432
+cp .env.example .env
 ```
 
-Expected result:
-
-```text
-localhost:5432 - accepting connections
-```
-
-### 7.2 Create DB role and database
-
-```bash
-psql -d postgres -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname='booking_user') THEN CREATE ROLE booking_user LOGIN PASSWORD 'booking_pass_123'; END IF; END \$\$;"
-
-if ! psql -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='booking_clone_db'" | grep -q 1; then
-  createdb -O booking_user booking_clone_db
-fi
-
-psql -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE booking_clone_db TO booking_user;"
-```
-
-### 7.3 Verify role and DB
-
-```bash
-psql -d postgres -c "\\du booking_user"
-psql -d postgres -c "\\l booking_clone_db"
-```
-
----
-
-## 8. Environment Variables (`.env`)
-
-Create `.env` from template:
-
-```bash
-cp .example.env .env
-```
-
-Set values:
+Useful local values:
 
 ```env
-SECRET_KEY=dev-secret-key-123
-DJANGORLAR_ENV_ID=local
+BOOKING_ENV_ID=dev
+BOOKING_SECRET_KEY=dev-secret-key
+BOOKING_DEBUG=True
+BOOKING_ALLOWED_HOSTS=localhost,127.0.0.1
 
-DB_NAME=booking_clone_db
-DB_USER=booking_user
-DB_PASSWORD=booking_pass_123
-DB_HOST=localhost
-DB_PORT=5432
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_CELERY_DB=1
+REDIS_DB=2
+BOOKING_REDIS_URL=redis://localhost:6379/2
 ```
 
----
+The development settings use SQLite by default:
 
-## 9. Run Project
+```text
+booking_clone/db.sqlite3
+```
+
+### 5. Start Redis
+
+Redis is used for cache-related endpoints and Celery. Start a local Redis
+server before running the full test suite or background workers.
+
+Example with Homebrew:
 
 ```bash
-python manage.py check
-python manage.py makemigrations
+brew services start redis
+```
+
+### 6. Run migrations
+
+```bash
 python manage.py migrate
+```
+
+### 7. Create a superuser
+
+```bash
+python manage.py createsuperuser
+```
+
+### 8. Seed sample data
+
+```bash
+python manage.py seed_db
+```
+
+To clear existing sample data first:
+
+```bash
+python manage.py seed_db --clear
+```
+
+### 9. Run the development server
+
+```bash
 python manage.py runserver
 ```
 
-App URLs:
+Main local URLs:
 
 - Admin: `http://127.0.0.1:8000/admin/`
-- API root (City): `http://127.0.0.1:8000/api/cities/`
+- Swagger: `http://127.0.0.1:8000/api/docs/swagger/`
+- ReDoc: `http://127.0.0.1:8000/api/docs/redoc/`
+- OpenAPI schema: `http://127.0.0.1:8000/api/schema/`
+- Localization demo: `http://127.0.0.1:8000/localization/`
 
----
+## Authentication
 
-## 10. City API Documentation
+The project uses JWT authentication.
 
-Base URL: `/api/cities/`
+Register:
 
-### 10.0 Available endpoints (quick list)
-
-- `GET /api/cities/` - list cities
-- `POST /api/cities/` - create city
-- `GET /api/cities/{id}/` - retrieve city
-- `PUT /api/cities/{id}/` - full update
-- `PATCH /api/cities/{id}/` - partial update
-- `DELETE /api/cities/{id}/` - delete city
-
-### 10.1 Create city
-
-`POST /api/cities/`
-
-Request:
-
-```json
-{
-  "name": "Almaty",
-  "country": "Kazakhstan"
-}
+```http
+POST /users/register/
 ```
 
-Response `201`:
+Login:
 
-```json
-{
-  "id": 1,
-  "name": "Almaty",
-  "country": "Kazakhstan",
-  "created_at": "2026-03-11T16:45:00.123456Z"
-}
+```http
+POST /users/login/
 ```
 
-### 10.2 List cities
+Refresh token:
 
-`GET /api/cities/`
-
-Response `200`:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Almaty",
-    "country": "Kazakhstan",
-    "created_at": "2026-03-11T16:45:00.123456Z"
-  }
-]
+```http
+POST /users/token/refresh/
 ```
 
-### 10.3 Retrieve city by id
+Authenticated API requests should include the access token:
 
-`GET /api/cities/{id}/`
-
-### 10.4 Update city
-
-`PATCH /api/cities/{id}/`
-
-Request:
-
-```json
-{
-  "name": "Astana"
-}
+```http
+Authorization: JWT <access_token>
 ```
 
-### 10.5 Delete city
+The SSE notification stream accepts a token through the `Authorization` header
+as `Bearer <access_token>` or through the `token` query parameter.
 
-`DELETE /api/cities/{id}/`
+## API Endpoints
 
-### 10.6 Validation behavior
-
-If duplicate (`name`, `country`) is sent, DB unique constraint prevents insert/update.
-API returns validation/DB error response (4xx).
-
----
-
-## 11. Team Workflow (Git)
-
-We use feature branches and pull requests.
-
-Typical flow:
-
-```bash
-git checkout main
-git pull origin main
-git checkout -b feature/<task-name>
-# code changes
-# tests/checks
-git add .
-git commit -m "Meaningful commit message"
-git push -u origin feature/<task-name>
-```
-
-Then open PR to `main` and request review.
-
----
-
-## 12. All Team Branches and Endpoints (Combined Catalog)
-
-The repository contains separate feature branches. Endpoints differ by branch because
-not all modules are merged into `main` yet.
-
-### 12.1 Branch list
-
-- `main`
-- `feature/city-crud`
-- `feature/city-crud-z3sker`
-- `feature/auth-and-users`
-- `feature/apartment-model`
-- `feature/booking`
-- `feature/reviews`
-- `feature/loggers`
-
-### 12.2 Endpoint map by branch
-
-#### `main`
-
-- `GET /admin/` (Django admin)
-
-#### `feature/city-crud`
-
-- `GET /api/cities/`
-- `POST /api/cities/`
-- `GET /api/cities/{id}/`
-- `PUT /api/cities/{id}/`
-- `PATCH /api/cities/{id}/`
-- `DELETE /api/cities/{id}/`
-
-#### `feature/auth-and-users`
-
-Base prefix: `/users/`
+### Users
 
 - `POST /users/register/`
 - `POST /users/login/`
+- `POST /users/token/refresh/`
 - `GET /users/personal-info/`
 - `PATCH /users/update-profile/`
-- `POST /users/token/refresh/`
 
-#### `feature/apartment-model`
-
-Includes user endpoints from `feature/auth-and-users`, plus property endpoints:
+### Apartments
 
 - `GET /properties/apartments/`
 - `POST /properties/apartments/`
@@ -371,56 +259,38 @@ Includes user endpoints from `feature/auth-and-users`, plus property endpoints:
 - `PUT /properties/apartments/{id}/`
 - `PATCH /properties/apartments/{id}/`
 - `DELETE /properties/apartments/{id}/`
+- `GET /properties/apartments/{id}/reviews/`
+- `GET /properties/apartments/{id}/availability/`
 
-#### `feature/booking`
+Apartment list filters:
 
-Includes users + properties, plus booking endpoints:
+- `city`
+- `country`
+- `rooms`
+- `min_price`
+- `max_price`
+- `check_in`
+- `check_out`
 
-- `GET /apps.bookings/bookings/`
-- `POST /apps.bookings/bookings/`
-- `GET /apps.bookings/bookings/{id}/`
-- `PUT /apps.bookings/bookings/{id}/`
-- `PATCH /apps.bookings/bookings/{id}/`
-- `DELETE /apps.bookings/bookings/{id}/`
-- `PATCH /apps.bookings/bookings/{id}/cancel/`
-- `PATCH /apps.bookings/bookings/{id}/update-status/`
-
-Note: in this branch URL prefix is literally `apps.bookings/` in `settings/urls.py`.
-
-#### `feature/reviews` and `feature/loggers`
-
-Includes users + properties + bookings + reviews:
-
-Users:
-
-- `POST /users/register/`
-- `POST /users/login/`
-- `GET /users/personal-info/`
-- `PATCH /users/update-profile/`
-- `POST /users/token/refresh/`
-
-Properties:
-
-- `GET /properties/apartments/`
-- `POST /properties/apartments/`
-- `GET /properties/apartments/{id}/`
-- `PUT /properties/apartments/{id}/`
-- `PATCH /properties/apartments/{id}/`
-- `DELETE /properties/apartments/{id}/`
-- `GET /properties/apartments/{id}/reviews/` (custom action)
-
-Bookings:
+### Bookings
 
 - `GET /bookings/`
 - `POST /bookings/`
 - `GET /bookings/{id}/`
-- `PUT /bookings/{id}/` (blocked with `405` in these branches)
-- `PATCH /bookings/{id}/` (blocked with `405` in these branches)
-- `DELETE /bookings/{id}/` (blocked with `405` in these branches)
 - `PATCH /bookings/{id}/cancel/`
 - `PATCH /bookings/{id}/update-status/`
 
-Reviews:
+Full update, partial update, and delete are intentionally disabled for normal
+booking records. Use the custom actions instead.
+
+Booking statuses:
+
+- `pending`
+- `confirmed`
+- `completed`
+- `cancelled`
+
+### Reviews
 
 - `GET /reviews/`
 - `POST /reviews/`
@@ -429,70 +299,182 @@ Reviews:
 - `PATCH /reviews/{id}/`
 - `DELETE /reviews/{id}/`
 
----
+Review list filters:
 
-## 13. Troubleshooting
+- `apartment`
+- `author`
+- `rating`
+- `min_rating`
+- `max_rating`
 
-### Problem: `AUTH_USER_MODEL refers to model 'auths.User'` / `'auths.CustomUser'`
+### Notifications
 
-Reason: app `auths` is not installed in current branch.
+- `GET /notifications/`
+- `GET /notifications/{id}/`
+- `PATCH /notifications/{id}/mark-read/`
+- `PATCH /notifications/mark-all-read/`
+- `GET /notifications/stream/`
 
-Fix for this branch:
+The stream endpoint uses Server-Sent Events and can replay missed events with
+`Last-Event-ID` or `last_event_id`.
 
-```python
-AUTH_USER_MODEL = "auth.User"
-```
+## Permissions
 
-### Problem: `pg_isready` shows `no response`
+The project uses custom permissions for role-based behavior:
 
-Check service and logs:
+- Landlords can create and manage their own apartments.
+- Renters can create bookings.
+- Tenants can cancel their own bookings.
+- Apartment owners can update booking status for their apartments.
+- Review authors can update or delete their own reviews.
+- Notifications are scoped to the authenticated user.
+
+## Redis, Celery, and Background Work
+
+Redis is used as:
+
+- Django cache backend through `django-redis`.
+- Celery broker/result backend for background tasks.
+
+Celery tasks:
+
+- `send_booking_confirmation_email`
+- `cleanup_stale_bookings`
+
+Celery Beat schedule:
+
+- `cleanup-stale-bookings-every-hour`
+
+Run a worker:
 
 ```bash
-brew services list | grep -i postgres
-tail -n 80 /opt/homebrew/var/log/postgresql@14.log
+celery -A settings.celery worker -l info
 ```
 
-If `postgresql.conf` is missing:
+Run Celery Beat:
 
 ```bash
-cp /opt/homebrew/var/postgresql@14/postgresql.conf.bak /opt/homebrew/var/postgresql@14/postgresql.conf
-brew services restart postgresql@14
+celery -A settings.celery beat -l info
 ```
 
-If syntax error near `log_t imezone`:
+## Localization and Internationalization
+
+Supported languages:
+
+- English: `en`
+- Russian: `ru`
+
+Localization is configured in `booking_clone/settings/base.py`.
+
+Language switching endpoint:
+
+```text
+/i18n/setlang/
+```
+
+Demo page:
+
+```text
+/localization/
+```
+
+Translation files:
+
+```text
+booking_clone/locale/en/LC_MESSAGES/django.po
+booking_clone/locale/ru/LC_MESSAGES/django.po
+```
+
+Update translations:
 
 ```bash
-perl -pi -e 's/^log_t\s+imezone\s*=/log_timezone =/' /opt/homebrew/var/postgresql@14/postgresql.conf
-brew services restart postgresql@14
+python manage.py makemessages -l en -l ru
+python manage.py compilemessages
 ```
 
----
+More details are documented in:
 
-## 14. Verification Checklist
+```text
+docs/localization_internationalization.md
+```
 
-Before creating PR:
+## API Documentation
 
-- `python manage.py check` passes
-- migrations are created and applied
-- `/api/cities/` returns `200`
-- create/update/delete city works
-- duplicate `(name, country)` is rejected
+drf-spectacular generates OpenAPI documentation.
 
----
+- Schema: `/api/schema/`
+- Swagger UI: `/api/docs/swagger/`
+- ReDoc: `/api/docs/redoc/`
 
-## 15. Next Steps
+The viewsets include schema descriptions, response serializers, request
+serializers, permissions, and examples for important endpoints.
 
-Planned backend expansion:
+## Logging
 
-- connect City to apartments/properties entities
-- authentication and permissions per endpoint
-- booking flow with status transitions
-- reviews module with rating aggregation
-- centralized logging and monitoring
+Logging is configured in `booking_clone/settings/conf.py`.
 
----
+Log files are written under:
 
-## Team Note
+```text
+booking_clone/logs/
+```
 
-This documentation is maintained by the team and updated per branch scope.
-When a module is merged to `main`, README sections should be synchronized accordingly.
+Configured log files:
+
+- `app.log`
+- `debug_requests.log`
+
+## Quality Checks
+
+Run Django checks:
+
+```bash
+python manage.py check
+```
+
+Run tests:
+
+```bash
+python manage.py test
+```
+
+or:
+
+```bash
+pytest
+```
+
+Run Ruff:
+
+```bash
+ruff check .
+ruff format --check .
+```
+
+## Team Workflow
+
+Use separate branches for each task.
+
+```bash
+git switch develop
+git pull origin develop
+git switch -c feature/<task-name>
+
+# make changes
+
+git status
+git add <changed-files>
+git commit -m "clear commit message"
+git push -u origin feature/<task-name>
+```
+
+Do not push directly to `develop`. Team admins review branches before merging.
+
+## Notes
+
+- The default remote branch is `develop`.
+- The local development database is SQLite.
+- Redis should be running for cache, Celery, and tests that touch cached
+  endpoints.
+- Docker-related work may exist in separate feature branches, but Docker files
+  are not part of the current `develop` branch documentation.

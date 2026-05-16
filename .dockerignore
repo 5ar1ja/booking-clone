@@ -1,0 +1,15 @@
+.env
+*.pyc
+**/__pycache__/
+redis-data
+.git
+.venv
+.ruff_cache
+docs
+*.md
+.DS_Store
+.pytest_cache
+.coverage
+booking_clone/logs
+requirements/dev.txt
+scripts/start.sh

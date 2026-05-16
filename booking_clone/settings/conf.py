@@ -1,16 +1,26 @@
 # Python modules
 import os
 from datetime import timedelta
-from decouple import Csv, config
 
 # Django modules
 from django.utils.log import RequireDebugTrue
 
+# Third-party modules
+from decouple import Csv, config
 
+
+# ----------------------------------------------
+# Path
+#
 SETTINGS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SETTINGS_DIR)
 
+os.makedirs(os.path.join(PROJECT_ROOT, 'logs'), exist_ok=True)
 
+
+# ----------------------------------------------
+# Core env vars
+#
 SECRET_KEY = config("BOOKING_SECRET_KEY", default="default-secret-key", cast=str)
 ENV_ID = config("BOOKING_ENV_ID", default="dev", cast=str)
 ALLOWED_ENV_IDS = ("dev", "prod",)
@@ -23,7 +33,9 @@ EMAIL_BACKEND = config(
 )
 
 
-
+# ----------------------------------------------
+# Django REST Framework
+#
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny'
@@ -32,10 +44,11 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'EXCEPTION_HANDLER': 'apps.core.exceptions.custom_exception_handler',
 }
 
-
+# ----------------------------------------------
+# Simple JWT
+#
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=240),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -76,7 +89,9 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-
+# ----------------------------------------------
+# DRF Spectacular
+#
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Booking Clone API',
     'DESCRIPTION': 'Comprehensive API for the Booking Clone platform.',
@@ -87,7 +102,9 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX': r'/api/',
 }
 
-
+# ----------------------------------------------
+# Debug Toolbar
+#
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.history.HistoryPanel',
     'debug_toolbar.panels.versions.VersionsPanel',
@@ -106,7 +123,9 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.profiling.ProfilingPanel',
 ]
 
-
+# ----------------------------------------------
+# Logging
+#
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -158,12 +177,22 @@ LOGGING = {
             'level': 'WARNING',
             'propagate': False,
         },
-        'users': {
+        'apps.users': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
         },
-        'booking': {
+        'apps.bookings': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'apps.properties': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'apps.reviews': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,
@@ -176,7 +205,9 @@ LOGGING = {
     },
 }
 
-
+# ------------------------------------------------
+# Redis Configuration
+#
 REDIS_HOST = config("REDIS_HOST", cast=str, default="localhost")
 REDIS_PORT = config("REDIS_PORT", cast=int, default=6379)
 REDIS_CELERY_DB = config("REDIS_CELERY_DB", cast=int, default=1)
@@ -185,7 +216,15 @@ REDIS_DB = config("REDIS_DB", cast=int, default=2)
 REDIS_CELERY_URL = config("BOOKING_CELERY_BROKER_URL", default=f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}")
 REDIS_URL = config("BOOKING_REDIS_URL", default=f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}")
 
+# ------------------------------------------------
+# Celery
+#
+CELERY_BROKER_URL = REDIS_CELERY_URL
+CELERY_RESULT_BACKEND = REDIS_CELERY_URL
 
+# ------------------------------------------------
+# Caching
+#
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",

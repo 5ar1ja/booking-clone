@@ -1,21 +1,25 @@
+# Python modules
 from __future__ import annotations
+from typing import Any
 
+# Django modules
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-ERR_EMAIL_REQUIRED = 'Users must have an email address'
-ERR_STAFF_REQUIRED = 'Superuser must have is_staff=True'
-ERR_SUPERUSER_REQUIRED = 'Superuser must have is_superuser=True'
+from apps.users.constants import ERR_ROLE_CONFLICT, ROLE_LANDLORD, ROLE_RENTER
 
-ROLE_LANDLORD = 'Landlord'
-ROLE_RENTER = 'Renter'
+ERR_EMAIL_REQUIRED = _('Users must have an email address')
+ERR_STAFF_REQUIRED = _('Superuser must have is_staff=True')
+ERR_SUPERUSER_REQUIRED = _('Superuser must have is_superuser=True')
 
 
 class CustomUserManager(BaseUserManager):
     '''Manager for CustomUser using email as the unique identifier.'''
 
     def create_user(
-        self, email: str, password: str | None = None, **extra_fields
+        self, email: str, password: str | None = None, **extra_fields: Any
     ) -> CustomUser:
         if not email:
             raise ValueError(ERR_EMAIL_REQUIRED)
@@ -26,7 +30,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(
-        self, email: str, password: str, **extra_fields
+        self, email: str, password: str, **extra_fields: Any
     ) -> CustomUser:
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -48,39 +52,39 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(
         unique=True,
-        verbose_name='Email address',
-        help_text='Unique identifier for the user.'
+        verbose_name=_('Email address'),
+        help_text=_('Unique identifier for the user.')
     )
     first_name = models.CharField(
         max_length=255,
-        verbose_name='First name',
-        help_text='User\'s given name.'
+        verbose_name=_('First name'),
+        help_text=_('User\'s given name.')
     )
     last_name = models.CharField(
         max_length=255,
-        verbose_name='Last name',
-        help_text='User\'s family name.'
+        verbose_name=_('Last name'),
+        help_text=_('User\'s family name.')
     )
 
     is_landlord = models.BooleanField(
         default=False,
-        verbose_name='Is landlord',
-        help_text='Designates whether the user can list apartments.'
+        verbose_name=_('Is landlord'),
+        help_text=_('Designates whether the user can list apartments.')
     )
     is_renter = models.BooleanField(
         default=False,
-        verbose_name='Is renter',
-        help_text='Designates whether the user can book apartments.'
+        verbose_name=_('Is renter'),
+        help_text=_('Designates whether the user can book apartments.')
     )
     is_active = models.BooleanField(
         default=True,
-        verbose_name='Is active',
-        help_text='Designates whether this user should be treated as active.'
+        verbose_name=_('Is active'),
+        help_text=_('Designates whether this user should be treated as active.')
     )
     is_staff = models.BooleanField(
         default=False,
-        verbose_name='Is staff',
-        help_text='Designates whether the user can log into this admin site.'
+        verbose_name=_('Is staff'),
+        help_text=_('Designates whether the user can log into this admin site.')
     )
 
     objects = CustomUserManager()
@@ -89,14 +93,38 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     class Meta:
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
         indexes = [
             models.Index(fields=['email']),
             models.Index(fields=['is_landlord']),
             models.Index(fields=['is_renter']),
         ]
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(is_superuser=True)
+                    | (
+                        models.Q(is_landlord=True, is_renter=False)
+                        | models.Q(is_landlord=False, is_renter=True)
+                    )
+                ),
+                name='users_regular_user_has_exactly_one_role',
+                violation_error_message=str(ERR_ROLE_CONFLICT),
+            ),
+        ]
 
     def __str__(self) -> str:
         role = 'Superuser' if self.is_superuser else (ROLE_LANDLORD if self.is_landlord else ROLE_RENTER)
         return f'{self.email} ({role})'
+
+    def clean(self) -> None:
+        if self.is_superuser:
+            return
+
+        if self.is_landlord == self.is_renter:
+            raise ValidationError(ERR_ROLE_CONFLICT)
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.clean()
+        super().save(*args, **kwargs)

@@ -1,19 +1,26 @@
+# Python modules
+from typing import Any
+
+# Django modules
+from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
+
+# Third-party modules
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
-from django.contrib.auth import authenticate
-
+# Project modules
+from apps.users.constants import ERR_ROLE_CONFLICT
 from apps.users.models import CustomUser
 
-ERR_ROLE_CONFLICT = 'You must choose exactly one role: Landlord or Renter.'
-ERR_INVALID_CREDENTIALS = 'Invalid email or password.'
-ERR_ACCOUNT_DISABLED = 'User account is disabled.'
-ERR_MISSING_CREDENTIALS = 'Must include \'email\' and \'password\'.'
+ERR_INVALID_CREDENTIALS = _('Invalid email or password.')
+ERR_ACCOUNT_DISABLED = _('User account is disabled.')
+ERR_MISSING_CREDENTIALS = _('Must include \'email\' and \'password\'.')
 
 
 class UserReadSerializer(serializers.ModelSerializer):
     '''Serializer for reading user data (GET requests).'''
-    
+
     class Meta:
         model = CustomUser
         fields = ['id', 'email', 'first_name', 'last_name', 'is_landlord', 'is_renter']
@@ -21,8 +28,8 @@ class UserReadSerializer(serializers.ModelSerializer):
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    '''Serializer for user registration (POST /register).'''
-    
+    '''Serializer for user registration; validates that exactly one role is selected and hashes password on creation.'''
+
     password = serializers.CharField(
         write_only=True,
         style={'input_type': 'password'},
@@ -32,19 +39,23 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ('email', 'password', 'first_name', 'last_name', 'is_landlord', 'is_renter')
 
-    def validate(self, data: dict) -> dict:
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        '''Ensure that exactly one role is selected: either landlord or renter, but not both.'''
+
         if data.get('is_landlord') == data.get('is_renter'):
             raise ValidationError(ERR_ROLE_CONFLICT)
         return data
 
-    def create(self, validated_data: dict) -> CustomUser:
+    def create(self, validated_data: dict[str, Any]) -> CustomUser:
+        '''Create a new user with hashed password.'''
+
         password = validated_data.pop('password')
         return CustomUser.objects.create_user(password=password, **validated_data)
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     '''Serializer for updating user profile (PATCH /update-profile).'''
-    
+
     password = serializers.CharField(
         write_only=True,
         style={'input_type': 'password'},
@@ -55,7 +66,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['first_name', 'last_name', 'password']
 
-    def update(self, instance: CustomUser, validated_data: dict) -> CustomUser:
+    def update(self, instance: CustomUser, validated_data: dict[str, Any]) -> CustomUser:
+        '''Update user data; if password is provided, hash it before saving.'''
+
         password = validated_data.pop('password', None)
         instance = super().update(instance, validated_data)
         if password:
@@ -65,12 +78,14 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.Serializer):
-    '''Serializer for user login (POST /login).'''
-    
+    '''Serializer for user login; validates credentials and returns the authenticated user.'''
+
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
-    def validate(self, data: dict) -> dict:
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        '''Validate user credentials and authenticate the user.'''
+
         email = data.get('email')
         password = data.get('password')
 
@@ -89,7 +104,7 @@ class UserLoginSerializer(serializers.Serializer):
 
 class LoginResponseSerializer(serializers.Serializer):
     '''Serializer for login response (includes JWT tokens).'''
-    
+
     id = serializers.IntegerField()
     email = serializers.EmailField()
     first_name = serializers.CharField()

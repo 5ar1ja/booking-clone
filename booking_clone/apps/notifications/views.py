@@ -1,18 +1,27 @@
+# Python modules
 import asyncio
+import json
 import logging
 from typing import AsyncGenerator
 
+# Django modules
+from django.db.models import QuerySet
+from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from django.utils.translation import gettext as _
+
+# Third-party modules
 from asgiref.sync import sync_to_async
-from django.http import HttpResponse, StreamingHttpResponse
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+# Project modules
 from .models import Notification
 from .serializers import NotificationSerializer
 from .utils import format_sse_event, get_user_from_jwt
+
 
 logger = logging.getLogger('apps.notifications')
 
@@ -29,11 +38,11 @@ class NotificationViewSet(
     permission_classes = [IsAuthenticated]
     serializer_class = NotificationSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Notification]:
         return Notification.objects.filter(user=self.request.user).select_related('booking')
 
     @action(methods=['patch'], detail=True, url_path='mark-read')
-    def mark_read(self, request: Request, pk=None) -> Response:
+    def mark_read(self, request: Request, pk: int | None = None) -> Response:
         notification = self.get_object()
         if not notification.is_read:
             notification.is_read = True
@@ -46,14 +55,14 @@ class NotificationViewSet(
         return Response({'updated': updated}, status=status.HTTP_200_OK)
 
 
-def _extract_token(request) -> str | None:
+def _extract_token(request: HttpRequest) -> str | None:
     auth_header = request.headers.get('Authorization', '')
     if auth_header.startswith('Bearer '):
         return auth_header.split(' ', 1)[1]
     return request.GET.get('token')
 
 
-def _parse_last_event_id(request) -> int:
+def _parse_last_event_id(request: HttpRequest) -> int:
     raw_value = request.headers.get('Last-Event-ID') or request.GET.get('last_event_id')
     if not raw_value:
         return 0
@@ -80,7 +89,8 @@ async def notification_event_generator(
 
     current_event_id = last_event_id
     logger.info('User %s subscribed to SSE stream from event %s.', user_id, last_event_id)
-    yield 'event: connected\ndata: {"info":"Connected to notification stream"}\n\n'
+    payload = json.dumps({'info': _('Connected to notification stream')})
+    yield f'event: connected\ndata: {payload}\n\n'
 
     while True:
         notifications = await sync_to_async(_get_notifications_for_user)(
@@ -96,17 +106,18 @@ async def notification_event_generator(
         yield ': ping\n\n'
         await asyncio.sleep(SSE_POLL_INTERVAL_SECONDS)
 
-async def stream_notifications(request):
+
+async def stream_notifications(request: HttpRequest) -> HttpResponse | StreamingHttpResponse:
     '''
     Async SSE endpoint with JWT auth and replay support via Last-Event-ID.
     '''
     token = _extract_token(request)
     if not token:
-        return HttpResponse('Unauthorized', status=401)
+        return HttpResponse(_('Unauthorized'), status=401)
 
     user = await sync_to_async(get_user_from_jwt)(token)
     if not user:
-        return HttpResponse('Invalid Token', status=401)
+        return HttpResponse(_('Invalid token'), status=401)
 
     last_event_id = _parse_last_event_id(request)
     response = StreamingHttpResponse(
