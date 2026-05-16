@@ -6,7 +6,6 @@ from typing import Any
 from django.db import transaction
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-from django.db import transaction
 
 # Third-party modules
 from drf_spectacular.types import OpenApiTypes
@@ -127,6 +126,8 @@ class BookingViewSet(
     }
 
     def get_permissions(self) -> list[BasePermission]:
+        '''Return the list of permissions based on the action.'''
+
         if self.action == ACTION_CANCEL:
             return [IsAuthenticated(), IsBookingTenant()]
         if self.action == ACTION_UPDATE_STATUS:
@@ -134,6 +135,8 @@ class BookingViewSet(
         return [permission() for permission in self.permission_classes]
 
     def get_queryset(self) -> QuerySet[Booking]:
+        '''Return the queryset of bookings based on the user's role.'''
+
         user = self.request.user
         if user.is_landlord:
             return Booking.objects.filter(
@@ -143,7 +146,17 @@ class BookingViewSet(
             tenant=user
         ).select_related('tenant', 'apartment')
 
+    def get_object(self, pk: Any = None) -> Booking:
+        '''Return the booking object for the given primary key.'''
+
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, pk=pk)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def list(self, request: DRFRequest) -> Response:
+        '''List bookings for the authenticated user.'''
+
         queryset = self.get_queryset()
 
         page = self.paginate_queryset(queryset)
@@ -155,6 +168,8 @@ class BookingViewSet(
         return Response(serializer.data)
 
     def create(self, request: DRFRequest) -> Response:
+        '''Create a new booking. Only renters can create bookings.'''
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -183,24 +198,32 @@ class BookingViewSet(
         read_serializer = BookingReadSerializer(booking, context=self.get_serializer_context())
         return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
-    def retrieve(self, request: DRFRequest, pk=None) -> Response:
-        booking = self.get_object()
+    def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Retrieve a specific booking.'''
+
+        booking = self.get_object(pk)
         serializer = self.get_serializer(booking)
         return Response(serializer.data)
 
-    def update(self, request: DRFRequest, pk=None) -> Response:
+    def update(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Full updates are not allowed. Use /cancel/ or /update-status/.'''
+
         return Response(
             {'detail': DETAIL_FULL_UPDATE_NOT_ALLOWED},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
 
-    def partial_update(self, request: DRFRequest, pk=None) -> Response:
+    def partial_update(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Partial updates are not allowed. Use /cancel/ or /update-status/ instead.'''
+
         return Response(
             {'detail': DETAIL_PARTIAL_UPDATE_NOT_ALLOWED},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
 
-    def destroy(self, request: DRFRequest, pk=None) -> Response:
+    def destroy(self, request: DRFRequest, pk: Any = None) -> Response:
+        '''Deletions are not allowed. Use the /cancel/ action instead.'''
+
         return Response(
             {'detail': DETAIL_DELETE_NOT_ALLOWED},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
@@ -209,8 +232,10 @@ class BookingViewSet(
     @action(methods=['patch'], detail=True, url_path='cancel')
     def cancel(self, request: DRFRequest, pk=None) -> Response:
         '''Renter cancels their own booking.'''
-        booking = self.get_object()
+
+        booking = self.get_object(pk)
         if booking.status == Booking.Status.CANCELLED:
+            logger.warning('Booking %s already cancelled, user=%s', booking.id, request.user.email)
             return Response(
                 {'detail': DETAIL_ALREADY_CANCELLED},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -231,14 +256,15 @@ class BookingViewSet(
                     actor_email=request.user.email,
                     previous_status=previous_status,
                 ),
-        )
+            )
 
         return Response(BookingReadSerializer(booking).data)
 
     @action(methods=['patch'], detail=True, url_path='update-status')
     def update_status(self, request: DRFRequest, pk=None) -> Response:
         '''Landlord accepts or rejects the booking.'''
-        booking = self.get_object()
+
+        booking = self.get_object(pk)
         serializer = self.get_serializer(booking, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
@@ -259,7 +285,6 @@ class BookingViewSet(
                 ),
             )
 
-        # Trigger delayed email task if status is CONFIRMED
         if new_status == Booking.Status.CONFIRMED:
             from .tasks import send_booking_confirmation_email
             transaction.on_commit(lambda: send_booking_confirmation_email.delay(booking.id))
