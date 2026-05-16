@@ -1,7 +1,5 @@
 x-app: &app
   build: .
-  env_file:
-    - booking_clone/.env
   environment:
     - BOOKING_ENV_ID=prod
     - DATABASE_URL=postgres://postgres:123456@db:5432/booking
@@ -17,9 +15,9 @@ services:
   db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: booking
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: ${POSTGRES_DB:-booking}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     expose:
       - "5432"
     volumes:

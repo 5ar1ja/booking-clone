@@ -1,4 +1,5 @@
 import os
+
 import dj_database_url
 
 # Project modules
@@ -19,7 +20,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-# Insert WhiteNoiseMiddleware after SecurityMiddleware
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
