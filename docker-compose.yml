@@ -1,19 +1,9 @@
 x-app: &app
   build: .
   environment:
-    BOOKING_ENV_ID: prod
-    BOOKING_SECRET_KEY: ${BOOKING_SECRET_KEY:-local-docker-secret-key}
-    BOOKING_DEBUG: "False"
-    BOOKING_ALLOWED_HOSTS: ${BOOKING_ALLOWED_HOSTS:-localhost,127.0.0.1}
-    DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-booking}
-    REDIS_HOST: redis
-    REDIS_PORT: "6379"
-    REDIS_CELERY_DB: "1"
-    REDIS_DB: "2"
-    BOOKING_REDIS_URL: redis://redis:6379/2
-    BOOKING_CELERY_BROKER_URL: redis://redis:6379/1
-    FLOWER_USER: ${FLOWER_USER:-admin}
-    FLOWER_PASSWORD: ${FLOWER_PASSWORD:-admin}
+    - BOOKING_ENV_ID=prod
+    - DATABASE_URL=postgres://postgres:123456@db:5432/booking
+    - REDIS_HOST=redis
   depends_on:
     redis:
       condition: service_healthy

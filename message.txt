@@ -1,0 +1,972 @@
+docker compose up
+[+] Running 7/0
+ ✔ Container midterm-db-1             Created                                                                                                                               0.0s 
+ ✔ Container midterm-redis-1          Created                                                                                                                               0.0s 
+ ✔ Container midterm-flower-1         Created                                                                                                                               0.0s 
+ ✔ Container midterm-web-1            Created                                                                                                                               0.0s 
+ ✔ Container midterm-nginx-1          Created                                                                                                                               0.0s 
+ ✔ Container midterm-celery_worker-1  Created                                                                                                                               0.0s 
+ ✔ Container midterm-celery_beat-1    Created                                                                                                                               0.0s 
+Attaching to celery_beat-1, celery_worker-1, db-1, flower-1, nginx-1, redis-1, web-1
+redis-1          | 1:C 16 May 2026 12:47:34.034 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-1          | 1:C 16 May 2026 12:47:34.034 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+redis-1          | 1:C 16 May 2026 12:47:34.034 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.
+conf                                                                                                                                                                             redis-1          | 1:M 16 May 2026 12:47:34.035 * monotonic clock: POSIX clock_gettime
+redis-1          | 1:M 16 May 2026 12:47:34.039 * Running mode=standalone, port=6379.
+redis-1          | 1:M 16 May 2026 12:47:34.042 * Server initialized
+redis-1          | 1:M 16 May 2026 12:47:34.043 * Loading RDB produced by version 7.4.8
+redis-1          | 1:M 16 May 2026 12:47:34.043 * RDB age 85 seconds
+redis-1          | 1:M 16 May 2026 12:47:34.043 * RDB memory usage when created 0.93 Mb
+redis-1          | 1:M 16 May 2026 12:47:34.043 * Done loading RDB, keys loaded: 0, keys expired: 0.
+redis-1          | 1:M 16 May 2026 12:47:34.043 * DB loaded from disk: 0.001 seconds
+redis-1          | 1:M 16 May 2026 12:47:34.044 * Ready to accept connections tcp
+db-1             | 
+db-1             | PostgreSQL Database directory appears to contain a database; Skipping initialization
+db-1             | 
+db-1             | 2026-05-16 12:47:34.133 UTC [1] LOG:  starting PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+db-1             | 2026-05-16 12:47:34.134 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+db-1             | 2026-05-16 12:47:34.134 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+db-1             | 2026-05-16 12:47:34.146 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+db-1             | 2026-05-16 12:47:34.168 UTC [29] LOG:  database system was shut down at 2026-05-16 12:46:09 UTC
+db-1             | 2026-05-16 12:47:34.206 UTC [1] LOG:  database system is ready to accept connections
+web-1            | Running migrations...
+nginx-1          | /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+nginx-1          | /docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+nginx-1          | /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+nginx-1          | 10-listen-on-ipv6-by-default.sh: info: can not modify /etc/nginx/conf.d/default.conf (read-only file system?)
+nginx-1          | /docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+nginx-1          | /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+nginx-1          | /docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+nginx-1          | /docker-entrypoint.sh: Configuration complete; ready for start up
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: using the "epoll" event method
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: nginx/1.27.5
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: built by gcc 14.2.0 (Alpine 14.2.0) 
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: OS: Linux 6.6.114.1-microsoft-standard-WSL2
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker processes
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 21
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 22
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 23
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 24
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 25
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 26
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 27
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 28
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 29
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 30
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 31
+nginx-1          | 2026/05/16 12:47:41 [notice] 1#1: start worker process 32
+celery_beat-1    | celery beat v5.4.0 (opalescent) is starting.
+web-1            | Operations to perform:
+web-1            |   Apply all migrations: admin, auth, bookings, contenttypes, django_celery_beat, notifications, properties, reviews, sessions, users
+web-1            | Running migrations:
+web-1            |   No migrations to apply.
+celery_beat-1    | __    -    ... __   -        _
+celery_beat-1    | LocalTime -> 2026-05-16 12:47:43
+celery_beat-1    | Configuration ->
+celery_beat-1    |     . broker -> redis://localhost:6379/1
+celery_beat-1    |     . loader -> celery.loaders.app.AppLoader
+celery_beat-1    |     . scheduler -> django_celery_beat.schedulers.DatabaseScheduler
+celery_beat-1    | 
+celery_beat-1    |     . logfile -> [stderr]@%INFO
+celery_beat-1    |     . maxinterval -> 5.00 seconds (5s)
+celery_beat-1    | [2026-05-16 12:47:43,389: INFO/MainProcess] beat: Starting...
+flower-1         | [I 260516 12:47:43 command:168] Visit me at http://0.0.0.0:5555
+flower-1         | [I 260516 12:47:43 command:176] Broker: redis://localhost:6379/1
+flower-1         | [I 260516 12:47:43 command:177] Registered tasks: 
+flower-1         |     ['apps.bookings.tasks.cleanup_stale_bookings',
+flower-1         |      'apps.bookings.tasks.send_booking_confirmation_email',
+flower-1         |      'celery.accumulate',
+flower-1         |      'celery.backend_cleanup',
+flower-1         |      'celery.chain',
+flower-1         |      'celery.chord',
+flower-1         |      'celery.chord_unlock',
+flower-1         |      'celery.chunks',
+flower-1         |      'celery.group',
+flower-1         |      'celery.map',
+flower-1         |      'celery.starmap',
+flower-1         |      'settings.celery.debug_task']
+celery_beat-1    | [2026-05-16 12:47:43,543: INFO/MainProcess] DatabaseScheduler: Schedule changed.
+web-1            | Collecting static files...
+celery_worker-1  |  
+celery_worker-1  |  -------------- celery@039d54ee8e99 v5.4.0 (opalescent)
+celery_worker-1  | --- ***** ----- 
+celery_worker-1  | -- ******* ---- Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.41 2026-05-16 12:47:43
+celery_worker-1  | - *** --- * --- 
+celery_worker-1  | - ** ---------- [config]
+celery_worker-1  | - ** ---------- .> app:         booking_clone:0x7215d9431850
+celery_worker-1  | - ** ---------- .> transport:   redis://localhost:6379/1
+celery_worker-1  | - ** ---------- .> results:     redis://localhost:6379/1
+celery_worker-1  | - *** --- * --- .> concurrency: 12 (prefork)
+celery_worker-1  | -- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+celery_worker-1  | --- ***** ----- 
+celery_worker-1  |  -------------- [queues]
+celery_worker-1  |                 .> celery           exchange=celery(direct) key=celery
+celery_worker-1  |                 
+celery_worker-1  | 
+celery_worker-1  | [tasks]
+celery_worker-1  |   . apps.bookings.tasks.cleanup_stale_bookings
+celery_worker-1  |   . apps.bookings.tasks.send_booking_confirmation_email
+celery_worker-1  |   . settings.celery.debug_task
+celery_worker-1  | 
+celery_worker-1  | [2026-05-16 12:47:44,860: WARNING/MainProcess] /usr/local/lib/python3.12/site-packages/celery/worker/consumer/consumer.py:508: CPendingDeprecationWarning: The
+ broker_connection_retry configuration setting will no longer determine                                                                                                          celery_worker-1  | whether broker connection retries are made during startup in Celery 6.0 and above.
+celery_worker-1  | If you wish to retain the existing behavior for retrying connections on startup,
+celery_worker-1  | you should set broker_connection_retry_on_startup to True.
+celery_worker-1  |   warnings.warn(
+celery_worker-1  | 
+celery_worker-1  | [2026-05-16 12:47:44,873: ERROR/MainProcess] consumer: Cannot connect to redis://localhost:6379/1: Error 111 connecting to localhost:6379. Connection refused.
+.                                                                                                                                                                                celery_worker-1  | Trying again in 2.00 seconds... (1/100)
+celery_worker-1  | 
+web-1            | 
+web-1            | 0 static files copied to '/app/booking_clone/staticfiles', 166 unmodified.
+web-1            | Compiling translations...
+celery_worker-1  | [2026-05-16 12:47:46,891: ERROR/MainProcess] consumer: Cannot connect to redis://localhost:6379/1: Error 111 connecting to localhost:6379. Connection refused.
+.                                                                                                                                                                                celery_worker-1  | Trying again in 4.00 seconds... (2/100)
+celery_worker-1  | 
+web-1            | File “/app/booking_clone/locale/ru/LC_MESSAGES/django.po” is already compiled and up to date.
+web-1            | File “/app/booking_clone/locale/en/LC_MESSAGES/django.po” is already compiled and up to date.
+web-1            | Starting: daphne -b 0.0.0.0 -p 8000 settings.asgi:application
+flower-1         | [E 260516 12:47:48 events:191] Failed to capture events: 'Error 111 connecting to localhost:6379. Connection refused.', trying again in 2 seconds.
+flower-1         | [E 260516 12:47:48 base_events:1833] Future exception was never retrieved
+flower-1         |     future: <Future finished exception=OperationalError('Error 111 connecting to localhost:6379. Connection refused.')>
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 951, in create_channel
+flower-1         |         return self._avail_channels.pop()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |     IndexError: pop from empty list
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 998, in connect_check_health
+flower-1         |         sock = self._connect()
+flower-1         |                ^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1512, in _connect
+flower-1         |         raise err
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1496, in _connect
+flower-1         |         sock.connect(socket_address)
+flower-1         |     ConnectionRefusedError: [Errno 111] Connection refused
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 474, in _reraise_as_library_errors
+flower-1         |         yield
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 461, in _ensure_connection
+flower-1         |         return retry_over_time(
+flower-1         |                ^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+flower-1         |         return fun(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 941, in _connection_factory
+flower-1         |         self._connection = self._establish_connection()
+flower-1         |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 863, in _establish_connection
+flower-1         |         conn = self.transport.establish_connection()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 975, in establish_connection
+flower-1         |         self._avail_channels.append(self.create_channel(self))
+flower-1         |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 953, in create_channel
+flower-1         |         channel = self.Channel(connection)
+flower-1         |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/redis.py", line 757, in __init__
+flower-1         |         self.client.ping()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/commands/core.py", line 1246, in ping
+flower-1         |         return self.execute_command("PING", **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 716, in execute_command
+flower-1         |         return self._execute_command(*args, **options)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 722, in _execute_command
+flower-1         |         conn = self.connection or pool.get_connection()
+flower-1         |                                   ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/utils.py", line 236, in wrapper
+flower-1         |         return func(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 2958, in get_connection
+flower-1         |         connection.connect()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 976, in connect
+flower-1         |         self.retry.call_with_retry(
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 132, in call_with_retry
+flower-1         |         raise error
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 120, in call_with_retry
+flower-1         |         return do()
+flower-1         |                ^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 977, in <lambda>
+flower-1         |         lambda: self.connect_check_health(
+flower-1         |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1022, in connect_check_health
+flower-1         |         raise e
+flower-1         |     redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         |     
+flower-1         |     The above exception was the direct cause of the following exception:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+flower-1         |         result = self.fn(*self.args, **self.kwargs)
+flower-1         |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/flower/inspector.py", line 39, in _inspect
+flower-1         |         else getattr(inspect, method)(safe=True)
+flower-1         |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 149, in active
+flower-1         |         return self._request('active', safe=safe)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 106, in _request
+flower-1         |         return self._prepare(self.app.control.broadcast(
+flower-1         |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 776, in broadcast
+flower-1         |         return self.mailbox(conn)._broadcast(
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/pidbox.py", line 340, in _broadcast
+flower-1         |         chan = channel or self.connection.default_channel
+flower-1         |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 960, in default_channel
+flower-1         |         self._ensure_connection(**conn_opts)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 460, in _ensure_connection
+flower-1         |         with ctx():
+flower-1         |              ^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+flower-1         |         self.gen.throw(value)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 478, in _reraise_as_library_errors
+flower-1         |         raise ConnectionError(str(exc)) from exc
+flower-1         |     kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         | [E 260516 12:47:48 base_events:1833] Future exception was never retrieved
+flower-1         |     future: <Future finished exception=OperationalError('Error 111 connecting to localhost:6379. Connection refused.')>
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 951, in create_channel
+flower-1         |         return self._avail_channels.pop()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |     IndexError: pop from empty list
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 998, in connect_check_health
+flower-1         |         sock = self._connect()
+flower-1         |                ^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1512, in _connect
+flower-1         |         raise err
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1496, in _connect
+flower-1         |         sock.connect(socket_address)
+flower-1         |     ConnectionRefusedError: [Errno 111] Connection refused
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 474, in _reraise_as_library_errors
+flower-1         |         yield
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 461, in _ensure_connection
+flower-1         |         return retry_over_time(
+flower-1         |                ^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+flower-1         |         return fun(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 941, in _connection_factory
+flower-1         |         self._connection = self._establish_connection()
+flower-1         |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 863, in _establish_connection
+flower-1         |         conn = self.transport.establish_connection()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 975, in establish_connection
+flower-1         |         self._avail_channels.append(self.create_channel(self))
+flower-1         |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 953, in create_channel
+flower-1         |         channel = self.Channel(connection)
+flower-1         |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/redis.py", line 757, in __init__
+flower-1         |         self.client.ping()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/commands/core.py", line 1246, in ping
+flower-1         |         return self.execute_command("PING", **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 716, in execute_command
+flower-1         |         return self._execute_command(*args, **options)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 722, in _execute_command
+flower-1         |         conn = self.connection or pool.get_connection()
+flower-1         |                                   ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/utils.py", line 236, in wrapper
+flower-1         |         return func(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 2958, in get_connection
+flower-1         |         connection.connect()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 976, in connect
+flower-1         |         self.retry.call_with_retry(
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 132, in call_with_retry
+flower-1         |         raise error
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 120, in call_with_retry
+flower-1         |         return do()
+flower-1         |                ^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 977, in <lambda>
+flower-1         |         lambda: self.connect_check_health(
+flower-1         |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1022, in connect_check_health
+flower-1         |         raise e
+flower-1         |     redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         |     
+flower-1         |     The above exception was the direct cause of the following exception:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+flower-1         |         result = self.fn(*self.args, **self.kwargs)
+flower-1         |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/flower/inspector.py", line 37, in _inspect
+flower-1         |         getattr(inspect, method)()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 166, in scheduled
+flower-1         |         return self._request('scheduled')
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 106, in _request
+flower-1         |         return self._prepare(self.app.control.broadcast(
+flower-1         |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 776, in broadcast
+flower-1         |         return self.mailbox(conn)._broadcast(
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/pidbox.py", line 340, in _broadcast
+flower-1         |         chan = channel or self.connection.default_channel
+flower-1         |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 960, in default_channel
+flower-1         |         self._ensure_connection(**conn_opts)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 460, in _ensure_connection
+flower-1         |         with ctx():
+flower-1         |              ^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+flower-1         |         self.gen.throw(value)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 478, in _reraise_as_library_errors
+flower-1         |         raise ConnectionError(str(exc)) from exc
+flower-1         |     kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+web-1            | 2026-05-16 12:47:48,514 INFO     Starting server at tcp:port=8000:interface=0.0.0.0
+web-1            | 2026-05-16 12:47:48,514 INFO     HTTP/2 support not enabled (install the http2 and tls Twisted extras)
+web-1            | 2026-05-16 12:47:48,514 INFO     Configuring endpoint tcp:port=8000:interface=0.0.0.0
+web-1            | 2026-05-16 12:47:48,515 INFO     Listening on TCP address 0.0.0.0:8000
+flower-1         | [E 260516 12:47:48 base_events:1833] Future exception was never retrieved
+flower-1         |     future: <Future finished exception=OperationalError('Error 111 connecting to localhost:6379. Connection refused.')>
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 951, in create_channel
+flower-1         |         return self._avail_channels.pop()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |     IndexError: pop from empty list
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 998, in connect_check_health
+flower-1         |         sock = self._connect()
+flower-1         |                ^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1512, in _connect
+flower-1         |         raise err
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1496, in _connect
+flower-1         |         sock.connect(socket_address)
+flower-1         |     ConnectionRefusedError: [Errno 111] Connection refused
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 474, in _reraise_as_library_errors
+flower-1         |         yield
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 461, in _ensure_connection
+flower-1         |         return retry_over_time(
+flower-1         |                ^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+flower-1         |         return fun(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 941, in _connection_factory
+flower-1         |         self._connection = self._establish_connection()
+flower-1         |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 863, in _establish_connection
+flower-1         |         conn = self.transport.establish_connection()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 975, in establish_connection
+flower-1         |         self._avail_channels.append(self.create_channel(self))
+flower-1         |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 953, in create_channel
+flower-1         |         channel = self.Channel(connection)
+flower-1         |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/redis.py", line 757, in __init__
+flower-1         |         self.client.ping()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/commands/core.py", line 1246, in ping
+flower-1         |         return self.execute_command("PING", **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 716, in execute_command
+flower-1         |         return self._execute_command(*args, **options)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 722, in _execute_command
+flower-1         |         conn = self.connection or pool.get_connection()
+flower-1         |                                   ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/utils.py", line 236, in wrapper
+flower-1         |         return func(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 2958, in get_connection
+flower-1         |         connection.connect()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 976, in connect
+flower-1         |         self.retry.call_with_retry(
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 132, in call_with_retry
+flower-1         |         raise error
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 120, in call_with_retry
+flower-1         |         return do()
+flower-1         |                ^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 977, in <lambda>
+flower-1         |         lambda: self.connect_check_health(
+flower-1         |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1022, in connect_check_health
+flower-1         |         raise e
+flower-1         |     redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         |     
+flower-1         |     The above exception was the direct cause of the following exception:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+flower-1         |         result = self.fn(*self.args, **self.kwargs)
+flower-1         |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/flower/inspector.py", line 37, in _inspect
+flower-1         |         getattr(inspect, method)()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 338, in active_queues
+flower-1         |         return self._request('active_queues')
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 106, in _request
+flower-1         |         return self._prepare(self.app.control.broadcast(
+flower-1         |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 776, in broadcast
+flower-1         |         return self.mailbox(conn)._broadcast(
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/pidbox.py", line 340, in _broadcast
+flower-1         |         chan = channel or self.connection.default_channel
+flower-1         |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 960, in default_channel
+flower-1         |         self._ensure_connection(**conn_opts)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 460, in _ensure_connection
+flower-1         |         with ctx():
+flower-1         |              ^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+flower-1         |         self.gen.throw(value)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 478, in _reraise_as_library_errors
+flower-1         |         raise ConnectionError(str(exc)) from exc
+flower-1         |     kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         | [E 260516 12:47:48 base_events:1833] Future exception was never retrieved
+flower-1         |     future: <Future finished exception=OperationalError('Error 111 connecting to localhost:6379. Connection refused.')>
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 951, in create_channel
+flower-1         |         return self._avail_channels.pop()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |     IndexError: pop from empty list
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 998, in connect_check_health
+flower-1         |         sock = self._connect()
+flower-1         |                ^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1512, in _connect
+flower-1         |         raise err
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1496, in _connect
+flower-1         |         sock.connect(socket_address)
+flower-1         |     ConnectionRefusedError: [Errno 111] Connection refused
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 474, in _reraise_as_library_errors
+flower-1         |         yield
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 461, in _ensure_connection
+flower-1         |         return retry_over_time(
+flower-1         |                ^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+flower-1         |         return fun(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 941, in _connection_factory
+flower-1         |         self._connection = self._establish_connection()
+flower-1         |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 863, in _establish_connection
+flower-1         |         conn = self.transport.establish_connection()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 975, in establish_connection
+flower-1         |         self._avail_channels.append(self.create_channel(self))
+flower-1         |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 953, in create_channel
+flower-1         |         channel = self.Channel(connection)
+flower-1         |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/redis.py", line 757, in __init__
+flower-1         |         self.client.ping()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/commands/core.py", line 1246, in ping
+flower-1         |         return self.execute_command("PING", **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 716, in execute_command
+flower-1         |         return self._execute_command(*args, **options)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 722, in _execute_command
+flower-1         |         conn = self.connection or pool.get_connection()
+flower-1         |                                   ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/utils.py", line 236, in wrapper
+flower-1         |         return func(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 2958, in get_connection
+flower-1         |         connection.connect()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 976, in connect
+flower-1         |         self.retry.call_with_retry(
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 132, in call_with_retry
+flower-1         |         raise error
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 120, in call_with_retry
+flower-1         |         return do()
+flower-1         |                ^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 977, in <lambda>
+flower-1         |         lambda: self.connect_check_health(
+flower-1         |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1022, in connect_check_health
+flower-1         |         raise e
+flower-1         |     redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         |     
+flower-1         |     The above exception was the direct cause of the following exception:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+flower-1         |         result = self.fn(*self.args, **self.kwargs)
+flower-1         |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/flower/inspector.py", line 37, in _inspect
+flower-1         |         getattr(inspect, method)()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 271, in registered
+flower-1         |         return self._request('registered', taskinfoitems=taskinfoitems)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 106, in _request
+flower-1         |         return self._prepare(self.app.control.broadcast(
+flower-1         |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 776, in broadcast
+flower-1         |         return self.mailbox(conn)._broadcast(
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/pidbox.py", line 340, in _broadcast
+flower-1         |         chan = channel or self.connection.default_channel
+flower-1         |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 960, in default_channel
+flower-1         |         self._ensure_connection(**conn_opts)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 460, in _ensure_connection
+flower-1         |         with ctx():
+flower-1         |              ^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+flower-1         |         self.gen.throw(value)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 478, in _reraise_as_library_errors
+flower-1         |         raise ConnectionError(str(exc)) from exc
+flower-1         |     kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         | [E 260516 12:47:48 base_events:1833] Future exception was never retrieved
+flower-1         |     future: <Future finished exception=OperationalError('Error 111 connecting to localhost:6379. Connection refused.')>
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 951, in create_channel
+flower-1         |         return self._avail_channels.pop()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |     IndexError: pop from empty list
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 998, in connect_check_health
+flower-1         |         sock = self._connect()
+flower-1         |                ^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1512, in _connect
+flower-1         |         raise err
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1496, in _connect
+flower-1         |         sock.connect(socket_address)
+flower-1         |     ConnectionRefusedError: [Errno 111] Connection refused
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 474, in _reraise_as_library_errors
+flower-1         |         yield
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 461, in _ensure_connection
+flower-1         |         return retry_over_time(
+flower-1         |                ^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+flower-1         |         return fun(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 941, in _connection_factory
+flower-1         |         self._connection = self._establish_connection()
+flower-1         |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 863, in _establish_connection
+flower-1         |         conn = self.transport.establish_connection()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 975, in establish_connection
+flower-1         |         self._avail_channels.append(self.create_channel(self))
+flower-1         |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 953, in create_channel
+flower-1         |         channel = self.Channel(connection)
+flower-1         |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/redis.py", line 757, in __init__
+flower-1         |         self.client.ping()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/commands/core.py", line 1246, in ping
+flower-1         |         return self.execute_command("PING", **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 716, in execute_command
+flower-1         |         return self._execute_command(*args, **options)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 722, in _execute_command
+flower-1         |         conn = self.connection or pool.get_connection()
+flower-1         |                                   ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/utils.py", line 236, in wrapper
+flower-1         |         return func(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 2958, in get_connection
+flower-1         |         connection.connect()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 976, in connect
+flower-1         |         self.retry.call_with_retry(
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 132, in call_with_retry
+flower-1         |         raise error
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 120, in call_with_retry
+flower-1         |         return do()
+flower-1         |                ^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 977, in <lambda>
+flower-1         |         lambda: self.connect_check_health(
+flower-1         |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1022, in connect_check_health
+flower-1         |         raise e
+flower-1         |     redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         |     
+flower-1         |     The above exception was the direct cause of the following exception:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+flower-1         |         result = self.fn(*self.args, **self.kwargs)
+flower-1         |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/flower/inspector.py", line 37, in _inspect
+flower-1         |         getattr(inspect, method)()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 254, in revoked
+flower-1         |         return self._request('revoked')
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 106, in _request
+flower-1         |         return self._prepare(self.app.control.broadcast(
+flower-1         |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 776, in broadcast
+flower-1         |         return self.mailbox(conn)._broadcast(
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/pidbox.py", line 340, in _broadcast
+flower-1         |         chan = channel or self.connection.default_channel
+flower-1         |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 960, in default_channel
+flower-1         |         self._ensure_connection(**conn_opts)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 460, in _ensure_connection
+flower-1         |         with ctx():
+flower-1         |              ^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+flower-1         |         self.gen.throw(value)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 478, in _reraise_as_library_errors
+flower-1         |         raise ConnectionError(str(exc)) from exc
+flower-1         |     kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         | [E 260516 12:47:48 base_events:1833] Future exception was never retrieved
+flower-1         |     future: <Future finished exception=OperationalError('Error 111 connecting to localhost:6379. Connection refused.')>
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 951, in create_channel
+flower-1         |         return self._avail_channels.pop()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |     IndexError: pop from empty list
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 998, in connect_check_health
+flower-1         |         sock = self._connect()
+flower-1         |                ^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1512, in _connect
+flower-1         |         raise err
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1496, in _connect
+flower-1         |         sock.connect(socket_address)
+flower-1         |     ConnectionRefusedError: [Errno 111] Connection refused
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 474, in _reraise_as_library_errors
+flower-1         |         yield
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 461, in _ensure_connection
+flower-1         |         return retry_over_time(
+flower-1         |                ^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+flower-1         |         return fun(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 941, in _connection_factory
+flower-1         |         self._connection = self._establish_connection()
+flower-1         |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 863, in _establish_connection
+flower-1         |         conn = self.transport.establish_connection()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 975, in establish_connection
+flower-1         |         self._avail_channels.append(self.create_channel(self))
+flower-1         |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 953, in create_channel
+flower-1         |         channel = self.Channel(connection)
+flower-1         |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/redis.py", line 757, in __init__
+flower-1         |         self.client.ping()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/commands/core.py", line 1246, in ping
+flower-1         |         return self.execute_command("PING", **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 716, in execute_command
+flower-1         |         return self._execute_command(*args, **options)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 722, in _execute_command
+flower-1         |         conn = self.connection or pool.get_connection()
+flower-1         |                                   ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/utils.py", line 236, in wrapper
+flower-1         |         return func(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 2958, in get_connection
+flower-1         |         connection.connect()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 976, in connect
+flower-1         |         self.retry.call_with_retry(
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 132, in call_with_retry
+flower-1         |         raise error
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 120, in call_with_retry
+flower-1         |         return do()
+flower-1         |                ^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 977, in <lambda>
+flower-1         |         lambda: self.connect_check_health(
+flower-1         |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1022, in connect_check_health
+flower-1         |         raise e
+flower-1         |     redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         |     
+flower-1         |     The above exception was the direct cause of the following exception:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+flower-1         |         result = self.fn(*self.args, **self.kwargs)
+flower-1         |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/flower/inspector.py", line 37, in _inspect
+flower-1         |         getattr(inspect, method)()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 386, in conf
+flower-1         |         return self._request('conf', with_defaults=with_defaults)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 106, in _request
+flower-1         |         return self._prepare(self.app.control.broadcast(
+flower-1         |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 776, in broadcast
+flower-1         |         return self.mailbox(conn)._broadcast(
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/pidbox.py", line 340, in _broadcast
+flower-1         |         chan = channel or self.connection.default_channel
+flower-1         |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 960, in default_channel
+flower-1         |         self._ensure_connection(**conn_opts)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 460, in _ensure_connection
+flower-1         |         with ctx():
+flower-1         |              ^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+flower-1         |         self.gen.throw(value)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 478, in _reraise_as_library_errors
+flower-1         |         raise ConnectionError(str(exc)) from exc
+flower-1         |     kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         | [E 260516 12:47:48 base_events:1833] Future exception was never retrieved
+flower-1         |     future: <Future finished exception=OperationalError('Error 111 connecting to localhost:6379. Connection refused.')>
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 951, in create_channel
+flower-1         |         return self._avail_channels.pop()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |     IndexError: pop from empty list
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 998, in connect_check_health
+flower-1         |         sock = self._connect()
+flower-1         |                ^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1512, in _connect
+flower-1         |         raise err
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1496, in _connect
+flower-1         |         sock.connect(socket_address)
+flower-1         |     ConnectionRefusedError: [Errno 111] Connection refused
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 474, in _reraise_as_library_errors
+flower-1         |         yield
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 461, in _ensure_connection
+flower-1         |         return retry_over_time(
+flower-1         |                ^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+flower-1         |         return fun(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 941, in _connection_factory
+flower-1         |         self._connection = self._establish_connection()
+flower-1         |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 863, in _establish_connection
+flower-1         |         conn = self.transport.establish_connection()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 975, in establish_connection
+flower-1         |         self._avail_channels.append(self.create_channel(self))
+flower-1         |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 953, in create_channel
+flower-1         |         channel = self.Channel(connection)
+flower-1         |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/redis.py", line 757, in __init__
+flower-1         |         self.client.ping()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/commands/core.py", line 1246, in ping
+flower-1         |         return self.execute_command("PING", **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 716, in execute_command
+flower-1         |         return self._execute_command(*args, **options)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 722, in _execute_command
+flower-1         |         conn = self.connection or pool.get_connection()
+flower-1         |                                   ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/utils.py", line 236, in wrapper
+flower-1         |         return func(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 2958, in get_connection
+flower-1         |         connection.connect()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 976, in connect
+flower-1         |         self.retry.call_with_retry(
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 132, in call_with_retry
+flower-1         |         raise error
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 120, in call_with_retry
+flower-1         |         return do()
+flower-1         |                ^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 977, in <lambda>
+flower-1         |         lambda: self.connect_check_health(
+flower-1         |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1022, in connect_check_health
+flower-1         |         raise e
+flower-1         |     redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         |     
+flower-1         |     The above exception was the direct cause of the following exception:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+flower-1         |         result = self.fn(*self.args, **self.kwargs)
+flower-1         |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/flower/inspector.py", line 37, in _inspect
+flower-1         |         getattr(inspect, method)()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 243, in stats
+flower-1         |         return self._request('stats')
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 106, in _request
+flower-1         |         return self._prepare(self.app.control.broadcast(
+flower-1         |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 776, in broadcast
+flower-1         |         return self.mailbox(conn)._broadcast(
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/pidbox.py", line 340, in _broadcast
+flower-1         |         chan = channel or self.connection.default_channel
+flower-1         |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 960, in default_channel
+flower-1         |         self._ensure_connection(**conn_opts)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 460, in _ensure_connection
+flower-1         |         with ctx():
+flower-1         |              ^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+flower-1         |         self.gen.throw(value)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 478, in _reraise_as_library_errors
+flower-1         |         raise ConnectionError(str(exc)) from exc
+flower-1         |     kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         | [E 260516 12:47:48 base_events:1833] Future exception was never retrieved
+flower-1         |     future: <Future finished exception=OperationalError('Error 111 connecting to localhost:6379. Connection refused.')>
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 951, in create_channel
+flower-1         |         return self._avail_channels.pop()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |     IndexError: pop from empty list
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 998, in connect_check_health
+flower-1         |         sock = self._connect()
+flower-1         |                ^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1512, in _connect
+flower-1         |         raise err
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1496, in _connect
+flower-1         |         sock.connect(socket_address)
+flower-1         |     ConnectionRefusedError: [Errno 111] Connection refused
+flower-1         |     
+flower-1         |     During handling of the above exception, another exception occurred:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 474, in _reraise_as_library_errors
+flower-1         |         yield
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 461, in _ensure_connection
+flower-1         |         return retry_over_time(
+flower-1         |                ^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+flower-1         |         return fun(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 941, in _connection_factory
+flower-1         |         self._connection = self._establish_connection()
+flower-1         |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 863, in _establish_connection
+flower-1         |         conn = self.transport.establish_connection()
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 975, in establish_connection
+flower-1         |         self._avail_channels.append(self.create_channel(self))
+flower-1         |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/virtual/base.py", line 953, in create_channel
+flower-1         |         channel = self.Channel(connection)
+flower-1         |                   ^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/transport/redis.py", line 757, in __init__
+flower-1         |         self.client.ping()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/commands/core.py", line 1246, in ping
+flower-1         |         return self.execute_command("PING", **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 716, in execute_command
+flower-1         |         return self._execute_command(*args, **options)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/client.py", line 722, in _execute_command
+flower-1         |         conn = self.connection or pool.get_connection()
+flower-1         |                                   ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/utils.py", line 236, in wrapper
+flower-1         |         return func(*args, **kwargs)
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 2958, in get_connection
+flower-1         |         connection.connect()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 976, in connect
+flower-1         |         self.retry.call_with_retry(
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 132, in call_with_retry
+flower-1         |         raise error
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/retry.py", line 120, in call_with_retry
+flower-1         |         return do()
+flower-1         |                ^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 977, in <lambda>
+flower-1         |         lambda: self.connect_check_health(
+flower-1         |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/redis/connection.py", line 1022, in connect_check_health
+flower-1         |         raise e
+flower-1         |     redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+flower-1         |     
+flower-1         |     The above exception was the direct cause of the following exception:
+flower-1         |     
+flower-1         |     Traceback (most recent call last):
+flower-1         |       File "/usr/local/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+flower-1         |         result = self.fn(*self.args, **self.kwargs)
+flower-1         |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/flower/inspector.py", line 37, in _inspect
+flower-1         |         getattr(inspect, method)()
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 177, in reserved
+flower-1         |         return self._request('reserved')
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 106, in _request
+flower-1         |         return self._prepare(self.app.control.broadcast(
+flower-1         |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/celery/app/control.py", line 776, in broadcast
+flower-1         |         return self.mailbox(conn)._broadcast(
+flower-1         |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/pidbox.py", line 340, in _broadcast
+flower-1         |         chan = channel or self.connection.default_channel
+flower-1         |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 960, in default_channel
+flower-1         |         self._ensure_connection(**conn_opts)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 460, in _ensure_connection
+flower-1         |         with ctx():
+flower-1         |              ^^^^^
+flower-1         |       File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+flower-1         |         self.gen.throw(value)
+flower-1         |       File "/usr/local/lib/python3.12/site-packages/kombu/connection.py", line 478, in _reraise_as_library_errors
+flower-1         |         raise ConnectionError(str(exc)) from exc
+flower-1         |     kombu.exceptions.OperationalError: Error 111 connecting to localhost:6379. Connection refused.
+celery_worker-1  | [2026-05-16 12:47:49,761: ERROR/MainProcess] consumer: Cannot connect to redis://localhost:6379/1: Error 111 connecting to localhost:6379. Connection refused.
+.                                                                                                                                                                                celery_worker-1  | Trying again in 6.00 seconds... (3/100)
+celery_worker-1  | 
+^CGracefully stopping... (press Ctrl+C again to force)
+[+] Stopping 7/7
+ ✔ Container midterm-flower-1         Stopped                                                                                                                              10.5s 
+ ✔ Container midterm-nginx-1          Stopped                                                                                                                               0.3s 
+ ✔ Container midterm-celery_worker-1  Stopped                                                                                                                              10.6s 
+ ✔ Container midterm-celery_beat-1    Stopped                                                                                                                              10.6s 
+ ✔ Container midterm-web-1            Stopped                                                                                                                               0.6s 
+ ✔ Container midterm-redis-1          Stopped                                                                                                                               0.3s 
+ ✔ Container midterm-db-1             Stopped                                                                                                                               0.4s 
+canceled

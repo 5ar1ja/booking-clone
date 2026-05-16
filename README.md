@@ -112,7 +112,120 @@ The ER diagram is stored in:
 docs/ERD.png
 ```
 
-## Setup
+## Docker Compose (recommended)
+
+The fastest way to run the full stack locally.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/) (included with Docker Desktop)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/5ar1ja/booking-clone.git
+cd booking-clone
+```
+
+### 2. Create the environment file
+
+```bash
+cp booking_clone/.env.example booking_clone/.env
+```
+
+Open `booking_clone/.env` and set at minimum:
+
+```env
+BOOKING_SECRET_KEY=your-secret-key-here
+BOOKING_ALLOWED_HOSTS=localhost,127.0.0.1
+ALLOWED_HOSTS=localhost,127.0.0.1
+REDIS_HOST=redis
+```
+
+> `REDIS_HOST` must be `redis` (the Docker service name), not `localhost`.
+
+### 3. Build and start all containers
+
+```bash
+docker compose up --build
+```
+
+On subsequent starts (no code changes):
+
+```bash
+docker compose up
+```
+
+### 4. What happens automatically on first start
+
+- Database migrations run
+- Static files are collected
+- Translations are compiled
+- A superuser is created if it does not exist yet
+
+Default superuser credentials (configurable via `.env`):
+
+```
+Email:    admin@example.com
+Password: admin123
+```
+
+### 5. Available URLs
+
+| URL | Description |
+|-----|-------------|
+| http://localhost | Main application |
+| http://localhost/admin/ | Django Admin |
+| http://localhost/api/docs/swagger/ | Swagger UI |
+| http://localhost/api/docs/redoc/ | ReDoc |
+| http://localhost:5555 | Flower (Celery monitor) |
+
+Flower credentials: `admin` / `admin` (set via `FLOWER_USER` / `FLOWER_PASSWORD` in `.env`).
+
+### 6. Useful commands
+
+Check running containers:
+
+```bash
+docker compose ps
+```
+
+View logs:
+
+```bash
+docker compose logs -f          # all services
+docker compose logs -f web      # Django only
+docker compose logs -f celery_worker
+```
+
+Stop all containers:
+
+```bash
+docker compose down
+```
+
+Stop and remove volumes (resets the database):
+
+```bash
+docker compose down -v
+```
+
+Run a Django management command:
+
+```bash
+docker compose exec web python manage.py <command>
+```
+
+Seed sample data:
+
+```bash
+docker compose exec web python manage.py seed_db
+```
+
+---
+
+## Local Development Setup
 
 ### 1. Clone the repository
 
@@ -495,5 +608,4 @@ Do not push directly to `develop`. Team admins review branches before merging.
 - The local development database is SQLite.
 - Redis should be running for cache, Celery, and tests that touch cached
   endpoints.
-- Docker-related work may exist in separate feature branches, but Docker files
-  are not part of the current `develop` branch documentation.
+- When running with Docker Compose, use `REDIS_HOST=redis` in `.env`, not `localhost`.
