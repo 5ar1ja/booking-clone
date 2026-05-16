@@ -1,16 +1,25 @@
-# Python modules
 import os
+import dj_database_url
 
 # Project modules
 from settings.base import *  # noqa: F403
 
 
 DEBUG = False
-ALLOWED_HOSTS = []  # Add production domains here, e.g. ["somedomain.com", "www.somedomain.com"]
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",") + ["*"]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+# Insert WhiteNoiseMiddleware after SecurityMiddleware
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.path.dirname(BASE_DIR), 'data', 'db.sqlite3'),  # noqa: F405
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+    )
 }

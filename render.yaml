@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: booking-clone-api
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "cd booking_clone && gunicorn settings.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: booking-clone-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DJANGO_SETTINGS_MODULE
+        value: "settings.env.prod"
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: BOOKING_DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "*"
+
+databases:
+  - name: booking-clone-db
+    databaseName: booking_clone
+    user: postgres
+    plan: free
