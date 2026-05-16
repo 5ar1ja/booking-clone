@@ -52,11 +52,6 @@ class Notification(TimestampedModel):
         verbose_name=_('Is read'),
         help_text=_('Whether the user has seen this notification.'),
     )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_('Created at'),
-        help_text=_('When the notification was generated.'),
-    )
 
     class Meta:
         verbose_name = _('Notification')

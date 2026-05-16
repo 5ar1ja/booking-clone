@@ -66,7 +66,4 @@ class ApartmentWriteSerializer(serializers.ModelSerializer):
         ]
         
     def create(self, validated_data: dict[str, Any]) -> Apartment:
-        '''Set the owner to the authenticated user when creating an apartment.'''
-
-        validated_data['owner'] = self.context['request'].user   
         return super().create(validated_data)
