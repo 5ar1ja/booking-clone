@@ -9,8 +9,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 # Project modules
-from .models import Booking, ERR_CHECKOUT_BEFORE_CHECKIN
-
+from apps.bookings.constants import ERR_CHECKOUT_BEFORE_CHECKIN
+from .models import Booking
 
 ERR_CHECKIN_PAST = _('check_in cannot be in the past')
 ERR_INVALID_STATUS = _('status must be either confirmed or cancelled')

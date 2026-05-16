@@ -4,6 +4,7 @@ from typing import Any
 
 # Django modules
 from django.db.models import QuerySet
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
