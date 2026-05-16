@@ -21,14 +21,33 @@ ERR_MISSING_CREDENTIALS = _('Must include \'email\' and \'password\'.')
 class UserReadSerializer(serializers.ModelSerializer):
     '''Serializer for reading user data (GET requests).'''
 
+    avatar = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'first_name', 'last_name', 'is_landlord', 'is_renter']
+        fields = [
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'avatar',
+            'is_landlord',
+            'is_renter',
+        ]
         read_only_fields = fields
+
+    def get_avatar(self, obj: CustomUser) -> str | None:
+        if not obj.avatar:
+            return None
+
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.avatar.url)
+        return obj.avatar.url
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    '''Serializer for user registration; validates that exactly one role is selected and hashes password on creation.'''
+    '''Serializer for creating a user account.'''
 
     password = serializers.CharField(
         write_only=True,
@@ -37,10 +56,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'password', 'first_name', 'last_name', 'is_landlord', 'is_renter')
+        fields = (
+            'email',
+            'password',
+            'first_name',
+            'last_name',
+            'is_landlord',
+            'is_renter',
+        )
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        '''Ensure that exactly one role is selected: either landlord or renter, but not both.'''
+        '''Require exactly one user role.'''
 
         if data.get('is_landlord') == data.get('is_renter'):
             raise ValidationError(ERR_ROLE_CONFLICT)
@@ -56,6 +82,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     '''Serializer for updating user profile (PATCH /update-profile).'''
 
+    avatar = serializers.ImageField(required=False, allow_null=True)
     password = serializers.CharField(
         write_only=True,
         style={'input_type': 'password'},
@@ -64,9 +91,13 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'password']
+        fields = ['first_name', 'last_name', 'avatar', 'password']
 
-    def update(self, instance: CustomUser, validated_data: dict[str, Any]) -> CustomUser:
+    def update(
+        self,
+        instance: CustomUser,
+        validated_data: dict[str, Any],
+    ) -> CustomUser:
         '''Update user data; if password is provided, hash it before saving.'''
 
         password = validated_data.pop('password', None)
@@ -78,7 +109,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.Serializer):
-    '''Serializer for user login; validates credentials and returns the authenticated user.'''
+    '''Serializer for user login.'''
 
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
