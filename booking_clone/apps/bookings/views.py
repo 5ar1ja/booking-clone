@@ -6,6 +6,7 @@ from typing import Any
 from django.db import transaction
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 
 # Third-party modules
 from drf_spectacular.types import OpenApiTypes
@@ -17,6 +18,7 @@ from rest_framework.request import Request as DRFRequest
 from rest_framework.response import Response
 
 # Project modules
+from apps.core.mixins.views import ActionSerializerMixin, ObjectLookupMixin, PaginationMixin
 from apps.core.pagination import StandardResultsSetPagination
 from apps.notifications.models import Notification
 from apps.notifications.utils import notify_after_commit
@@ -105,7 +107,12 @@ def build_booking_notification_metadata(
         responses={200: BookingReadSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT},
     ),
 )
-class BookingViewSet(viewsets.ViewSet):
+class BookingViewSet(
+    ActionSerializerMixin,
+    ObjectLookupMixin,
+    PaginationMixin,
+    viewsets.ViewSet,
+):
     '''
     ViewSet for bookings.
     Uses BookingReadSerializer for GET
@@ -113,6 +120,11 @@ class BookingViewSet(viewsets.ViewSet):
     '''
     permission_classes = [IsAuthenticated, IsRenterOrReadOnly]
     pagination_class = StandardResultsSetPagination
+    serializer_class = BookingReadSerializer
+    serializer_action_classes = {
+        'create': BookingWriteSerializer,
+        'update_status': BookingStatusSerializer,
+    }
 
     def get_permissions(self) -> list[BasePermission]:
         if self.action == ACTION_CANCEL:
@@ -131,80 +143,73 @@ class BookingViewSet(viewsets.ViewSet):
             tenant=user
         ).select_related('tenant', 'apartment')
 
-    def get_object(self, pk: Any = None) -> Booking:
-        queryset = self.get_queryset()
-        obj = get_object_or_404(queryset, pk=pk)
-        self.check_object_permissions(self.request, obj)
-        return obj
-
     def list(self, request: DRFRequest) -> Response:
         queryset = self.get_queryset()
-        
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(queryset, request, view=self)
-        if page is not None:
-            serializer = BookingReadSerializer(page, many=True)
-            return paginator.get_paginated_response(serializer.data)
 
-        serializer = BookingReadSerializer(queryset, many=True)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     def create(self, request: DRFRequest) -> Response:
-        serializer = BookingWriteSerializer(data=request.data)
-        if serializer.is_valid():
-            with transaction.atomic():
-                booking = serializer.save(tenant=request.user)
-                logger.info(
-                    'Booking created: tenant=%s, apartment_id=%s',
-                    request.user.email,
-                    booking.apartment_id,
-                )
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-                notify_after_commit(
-                    user=booking.apartment.owner,
-                    event_type=Notification.EventType.BOOKING_CREATED,
-                    message=(
-                        f'New booking request from {request.user.email} '
-                        f'for "{booking.apartment.title}".'
-                    ),
-                    booking=booking,
-                    metadata=build_booking_notification_metadata(
-                        booking,
-                        actor_email=request.user.email,
-                    ),
-                )
+        with transaction.atomic():
+            booking = serializer.save(tenant=request.user)
+            logger.info(
+                'Booking created: tenant=%s, apartment_id=%s',
+                request.user.email,
+                booking.apartment_id,
+            )
 
-            read_serializer = BookingReadSerializer(booking)
-            return Response(read_serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            notify_after_commit(
+                user=booking.apartment.owner,
+                event_type=Notification.EventType.BOOKING_CREATED,
+                message=(
+                    f'New booking request from {request.user.email} '
+                    f'for "{booking.apartment.title}".'
+                ),
+                booking=booking,
+                metadata=build_booking_notification_metadata(
+                    booking,
+                    actor_email=request.user.email,
+                ),
+            )
 
-    def retrieve(self, request: DRFRequest, pk: Any = None) -> Response:
-        booking = self.get_object(pk)
-        serializer = BookingReadSerializer(booking)
+        read_serializer = BookingReadSerializer(booking, context=self.get_serializer_context())
+        return Response(read_serializer.data, status=status.HTTP_201_CREATED)
+
+    def retrieve(self, request: DRFRequest, pk=None) -> Response:
+        booking = self.get_object()
+        serializer = self.get_serializer(booking)
         return Response(serializer.data)
 
-    def update(self, request: DRFRequest, pk: Any = None) -> Response:
+    def update(self, request: DRFRequest, pk=None) -> Response:
         return Response(
             {'detail': DETAIL_FULL_UPDATE_NOT_ALLOWED},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
 
-    def partial_update(self, request: DRFRequest, pk: Any = None) -> Response:
+    def partial_update(self, request: DRFRequest, pk=None) -> Response:
         return Response(
             {'detail': DETAIL_PARTIAL_UPDATE_NOT_ALLOWED},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
 
-    def destroy(self, request: DRFRequest, pk: Any = None) -> Response:
+    def destroy(self, request: DRFRequest, pk=None) -> Response:
         return Response(
             {'detail': DETAIL_DELETE_NOT_ALLOWED},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
 
     @action(methods=['patch'], detail=True, url_path='cancel')
-    def cancel(self, request: DRFRequest, pk: Any = None) -> Response:
+    def cancel(self, request: DRFRequest, pk=None) -> Response:
         '''Renter cancels their own booking.'''
-        booking = self.get_object(pk)
+        booking = self.get_object()
         if booking.status == Booking.Status.CANCELLED:
             return Response(
                 {'detail': DETAIL_ALREADY_CANCELLED},
@@ -226,15 +231,15 @@ class BookingViewSet(viewsets.ViewSet):
                     actor_email=request.user.email,
                     previous_status=previous_status,
                 ),
-            )
+        )
 
         return Response(BookingReadSerializer(booking).data)
 
     @action(methods=['patch'], detail=True, url_path='update-status')
-    def update_status(self, request: DRFRequest, pk: Any = None) -> Response:
+    def update_status(self, request: DRFRequest, pk=None) -> Response:
         '''Landlord accepts or rejects the booking.'''
-        booking = self.get_object(pk)
-        serializer = BookingStatusSerializer(booking, data=request.data, partial=True)
+        booking = self.get_object()
+        serializer = self.get_serializer(booking, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
         previous_status = booking.status
@@ -266,4 +271,4 @@ class BookingViewSet(viewsets.ViewSet):
             new_status,
             request.user.email,
         )
-        return Response(BookingReadSerializer(booking).data)
+        return Response(BookingReadSerializer(booking, context=self.get_serializer_context()).data)
