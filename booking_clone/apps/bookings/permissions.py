@@ -1,7 +1,7 @@
 from typing import Any
-
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.request import Request
+from apps.core.permissions import IsRenter
 
 
 class IsRenterOrReadOnly(BasePermission):
@@ -10,7 +10,7 @@ class IsRenterOrReadOnly(BasePermission):
     def has_permission(self, request: Request, view: Any) -> bool:
         if request.method in SAFE_METHODS:
             return request.user.is_authenticated
-        return request.user.is_authenticated and request.user.is_renter
+        return IsRenter().has_permission(request, view)
 
 
 class IsBookingTenant(BasePermission):
